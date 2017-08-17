@@ -3,15 +3,14 @@
 int main();
 int prompt();
 int cls();
+int printAt(char x, char y);
 
 //				"012345678901234567890123456789012"
 char title[] =	"       Monument Microgames\n      and Donkeysoft MMXVII\n\n         P R E S E N T S\n\n sunday league football manager\n   *** concept by: Shaun B\n   *** testing by: Graz R\n   *** greetings to all ZX fanz\n     P R E S S  A N Y  K E Y\n";
 
+char teams[256];
 
-
-char teams[] = "";
-
-unsigned int i;
+char i[];
 
 int main()
 {
@@ -19,7 +18,6 @@ int main()
 	prompt();
 	gets(i);
 	cls();
-	printf("and we're done, for now\n");
 	prompt();
 	gets(i);
 	return 0;
@@ -33,14 +31,6 @@ int prompt()
 
 int cls()
 {
-//	for(i=23; i>0; i--)
-//	{
-//		printf("\n");
-//	}
-//	#asm
-//		call 0x0747
-//	#endasm
-//	return 0;
 	#asm
 	exx
 	ld hl,($400c)
@@ -67,6 +57,13 @@ int cls()
 	EXIT:
 	call $0747
 	exx
+	#endasm
+	return 0;
+}
+
+int printAt(char x, char y)
+{
+	#asm
 	#endasm
 	return 0;
 }
