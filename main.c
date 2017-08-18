@@ -4,10 +4,14 @@
 	#define SCRLOC(X,Y)	(X<<8|Y)
 #endif
 
+#ifndef INVERSE(A)
+	#define INVERSE(A)	(0x80 | A)
+#endif
+
 int main();
 int prompt();
 int cls();
-int printAt(char string[255], short xy);
+int printAt(short xy, char string[32]);
 
 //				"012345678901234567890123456789012"
 char title[] =	"       Monument Microgames\n      and Donkeysoft MMXVII\n\n         P R E S E N T S\n\n sunday league football manager\n   *** concept by: Shaun B\n   *** testing by: Graz R\n   *** greetings to all ZX fanz\n     P R E S S  A N Y  K E Y\n";
@@ -19,6 +23,15 @@ char x,y;
 short z, _z;
 char c;
 
+/**
+ * Main entry point of application
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	18 Aug 2017
+ * @version	1.0
+ * @return	int
+ */
 int main()
 {
 	cls();
@@ -34,12 +47,30 @@ int main()
 	return 0;
 }
 
+/**
+ * Outputs the prompt
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	18 Aug 2017
+ * @version	1.0
+ * @return	int
+ */
 int prompt()
 {
 	printf("c:>");
 	return 0;
 }
 
+/**
+ * Clears the screen
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	18 Aug 2017
+ * @version	1.0
+ * @return	int
+ */
 int cls()
 {
 	#asm
@@ -72,7 +103,20 @@ int cls()
 	return 0;
 }
 
-int printAt(char string[255], short xy)
+/**
+ * This should use HB/LB in a 16-bit word
+ * to determine the X and Y co-ordinates
+ * of the screen
+ * printAt is limited to 32 characters per
+ * call
+ *
+ * @param	short, char[]
+ * @author	sbebbington
+ * @date	18 Aug 2017
+ * @version	1.0
+ * @return	int
+ */
+int printAt(short xy, char string[32])
 {
 	#asm
 	exx
