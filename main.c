@@ -1,51 +1,65 @@
 #include <stdio.h>
 
-#ifndef SCRLOC(X,Y)
-	#define SCRLOC(X,Y)	(X<<8|Y)
-#endif
-
-#ifndef INVERSE(A)
-	#define INVERSE(A)	(0x80 | A)
-#endif
+#define SCRLOC(X,Y)	(((Y<<5)+Y)+X)
+#define INVERSE(A)	(0x80 | A)
+#define NL			0x76
+#define EOF			0xff
 
 int main();
+int zx80Init();
 int prompt();
 int cls();
-int printAt(short xy, char string[32]);
+unsigned short printAt(unsigned short xy);
 
 //				"012345678901234567890123456789012"
 char title[] =	"       Monument Microgames\n      and Donkeysoft MMXVII\n\n         P R E S E N T S\n\n sunday league football manager\n   *** concept by: Shaun B\n   *** testing by: Graz R\n   *** greetings to all ZX fanz\n     P R E S S  A N Y  K E Y\n";
 
 char teams[256] = "team1,team2,team3";
 
-char i[];
-char x,y;
-short z, _z;
 char c;
+
+unsigned char text[32];
 
 /**
  * Main entry point of application
  *
  * @param	na
  * @author	sbebbington
- * @date	18 Aug 2017
+ * @date	18 Aug 20171
  * @version	1.0
  * @return	int
  */
 int main()
 {
-	cls();
-	printf(title);
-	prompt();
-	gets(i);
-	cls();
-	prompt();
-	x=10;
-	y=10;
-	printAt("hello", SCRLOC(x,y));
-	gets(i);
+	zx80Init();
+	for(c=12;c>=0;c--)
+	{
+		printAt(SCRLOC(c,c));
+	}
+	gets(text);
+//	
+//	gets(i);
+//	printf(title);
+//	prompt();
+//	gets(i);
+//	cls();
+//	prompt();
+//	x=10;
+//	y=10;
+//	printAt("hello", SCRLOC(x,y));
+//	gets(i);
 	return 0;
 }
+
+int zx80Init()
+{
+	for(c=24;c>=0;c--)
+	{
+		printf("                                \n");
+	}
+	return cls();
+}
+
 
 /**
  * Outputs the prompt
@@ -87,60 +101,46 @@ int cls()
 		inc hl
 		dec c
 		jp z,DECB
-		jr CLS
+		jp CLS
 	DECB:
 		dec b
 		jp z,EXIT
-		jr CLS
+		jp CLS
 	NEWLINE:
 		ld (hl),$76
 		ld d,$21
-		jr DECC
+		jp DECC
 	EXIT:
 	call $0747
 	exx
 	#endasm
-	return 0;
 }
 
 /**
- * This should use HB/LB in a 16-bit word
- * to determine the X and Y co-ordinates
- * of the screen
- * printAt is limited to 32 characters per
- * call
+ * At the moment, this is a test function that
+ * will generate a single character at x,y position
+ * change:
+ *		ld c,$26
+ * to the desired character to output, or change the
+ * following line
  *
- * @param	short, char[]
+ * @param	unsigned short
  * @author	sbebbington
- * @date	18 Aug 2017
- * @version	1.0
+ * @date	20 Aug 2017
+ * @version	1.2
  * @return	int
  */
-int printAt(short xy, char string[32])
+unsigned char __FASTCALL__ printAt(unsigned short xy)
 {
 	#asm
-	exx
-	ld hl,$0002
-	add hl,sp
-	ld b,(hl)
-	inc l
-	jp z,INCH
-	CONT:
-		ld c,(hl)
-		jr OUTPUT
-	INCH:
-		inc h
-		jp CONT
-	OUTPUT:
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;; So we chould have x and y in the register
-	;; pair BC, we now need to go C down and B
-	;; across or something like that
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	exx
+	push bc
+	ld b,h
+	ld c,l
+	ld hl,($400c)
+	inc hl
+	add hl,bc
+	ld c,$26
+	ld (hl),c
+	pop bc
 	#endasm
-	
-	printf(string);
-	printf("%d",xy);
-	return 0;
 }
