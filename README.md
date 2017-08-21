@@ -6,6 +6,8 @@ A football management game written in C and Z80 assembly for the Sinclair ZX80 w
 	Testing:	Moggy, Graz R
 	Tech support:	Andy Rea, Dr Beep
 	
-	(c) Donkeysoft MMXVII
-
+	(c) Donkeysoft MMXVII - published on real media by Monument Microgames
+	http://www.monumentmicrogames.com/
+	
+	Look out for more exciting Donkeysoft productions for your Sinclair home computer
 --
