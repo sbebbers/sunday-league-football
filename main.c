@@ -266,12 +266,12 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
  *
  * @param	na
  * @author	sbebbington
- * @date	18 Aug 2017
- * @version	1.0
+ * @date	21 Aug 2017
+ * @version	1.1
  */
 unsigned char cls()
 {
-	#asm
+	__asm
 	exx
 	ld hl,($400c)
 	ld bc,$0300
@@ -279,25 +279,25 @@ unsigned char cls()
 	inc hl
 	CLS:
 		dec d
-		jp z,NEWLINE
+		jr z,NEWLINE
 		ld (hl),$00
 	DECC:
 		inc hl
 		dec c
-		jp z,DECB
-		jp CLS
+		jr z,DECB
+		jr CLS
 	DECB:
 		dec b
-		jp z,EXIT
-		jp CLS
+		jr z,EXIT
+		jr CLS
 	NEWLINE:
 		ld (hl),$76
 		ld d,$21
-		jp DECC
+		jr DECC
 	EXIT:
 	call $0747
 	exx
-	#endasm
+	__endasm;
 }
 
 /**
@@ -309,11 +309,11 @@ unsigned char cls()
  * @param	unsigned char, unsigned char
  * @author	sbebbington
  * @date	21 Aug 2017
- * @version	1.2
+ * @version	1.2a
  */
 unsigned char printAt(unsigned short xy) __z88dk_fastcall
 {
-	#asm
+	__asm
 	ld b,h
 	ld c,l
 	ld hl,($400c)
@@ -327,7 +327,7 @@ unsigned char printAt(unsigned short xy) __z88dk_fastcall
 		ld (hl),a
 		inc bc
 		inc hl
-		jp CHAROUT
+		jr CHAROUT
 	RETURN:
-	#endasm
+	__endasm;
 }

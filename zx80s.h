@@ -2,53 +2,36 @@
  * Repurposed ZX81 header for the ZX80
  *
  * @author:     Shaun B
- * @version:    1.0.4 - 2017-08-19
+ * @version:    1.0.4 - 2017-08-21
  *
  **/
 
 /// Pre-processor symbols:
-#define SCRLOC(X,Y)	(((Y<<5)+Y)+X)
-#define INVERSE(A)	(0x80 | A)
-#define EOF			0xff
-#define DIVBYTEN(Z)	((Z>>3) - (Z>>1))
-#define PRINTAT		0x08f5
-#define PRINT		0x10
-#define MAXWIDTH    32
-#define MAXHEIGHT   20
-#define SCRWIDTH	32
-#define SCRHEIGHT	22
-#define WIDTH       16
-#define HEIGHT      16
-#define MAXSTEPS	32767
-#define MINSTEPS	12
-#define MINWIDTH    9
-#define MINHEIGHT   9
-// ZX81 character set:
 #define CLEAR		0x00
-#define TL			0x01
-#define TR			0x02
-#define TOP			0x03
-#define BL			0x04
-#define LEFT		0x05
-#define CHECKER		0x06
-#define CORNER		0x07
-#define CHESSB		0x08
-#define CHESSBOT	0x09
-#define CHESSTOP	0x0a
-#define QUOTE		0x0b
+#define QUOTE		0x01
+#define LEFT		0x02
+#define BOTTOM		0x03
+#define TL			0x04
+#define TR			0x05
+#define BL			0x06
+#define BR			0x07
+#define BLTR		0x08
+#define CHESSBOARD	0x09
+#define CHESSBTM	0x0a
+#define CHESSTOP	0x0b
 #define POUND		0x0c
 #define DOLLAR		0x0d
 #define COLON		0x0e
 #define QM			0x0f
 #define OBRACKET	0x10
 #define CBRACKET	0x11
-#define GRT			0x12
-#define LST			0x13
-#define EQUALS		0x14
-#define PLUS		0x15
-#define DASH		0x16
-#define STAR		0x17
-#define SLASH		0x18
+#define DASH		0x12
+#define PLUS		0x13
+#define STAR		0x14
+#define SLASH		0x15
+#define EQUALS		0x16
+#define GT			0x17
+#define LT			0x18
 #define SEMI		0x19
 #define COMMA		0x1a
 #define DOT			0x1b
@@ -88,6 +71,7 @@
 #define _X			0x3d
 #define _Y			0x3e
 #define _Z			0x3f
-#define EOS			0x40
-#define NEWLINE		0x76
-#define DFILE		0x400c
+#define SCRLOC(X,Y)	(((Y<<5)+Y)+X)
+#define INVERSE(A)	(0x80 | A)
+#define NL			0x76
+#define EOF			0xff
