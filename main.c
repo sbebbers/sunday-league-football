@@ -69,6 +69,7 @@
 #define INVERSE(A)	(0x80 | A)
 #define NL			0x76
 #define EOF			0xff
+#define DFILE		$400c
 
 /**
  * Function prototypes
@@ -139,7 +140,7 @@ unsigned char startGame()
 {
 	unsigned char yn[2];
 	unsigned char _manager[16];
-	prompt("please enter your name\n(max 16 characters, no spaces)", 8);
+	prompt("please enter your name\n(max 16 characters)", 8);
 	_manager[0] = CLEAR;
 	gets(_manager);
 	if(!_manager[0])
@@ -266,21 +267,23 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
  *
  * @param	na
  * @author	sbebbington
- * @date	21 Aug 2017
- * @version	1.1
+ * @date	22 Aug 2017
+ * @version	1.1a
+ * @todo	Should be able to increase just the L
+ * 			register of the DFILE
  */
 unsigned char cls()
 {
 	__asm
 	exx
-	ld hl,($400c)
+	ld hl,(_DFILE)
 	ld bc,$0300
 	ld d,$21
-	inc hl
+	inc l
 	CLS:
 		dec d
 		jr z,NEWLINE
-		ld (hl),$00
+		ld (hl),_CLEAR
 	DECC:
 		inc hl
 		dec c
@@ -291,7 +294,7 @@ unsigned char cls()
 		jr z,EXIT
 		jr CLS
 	NEWLINE:
-		ld (hl),$76
+		ld (hl),_NL
 		ld d,$21
 		jr DECC
 	EXIT:
@@ -308,16 +311,16 @@ unsigned char cls()
  *
  * @param	unsigned char, unsigned char
  * @author	sbebbington
- * @date	21 Aug 2017
- * @version	1.2a
+ * @date	22 Aug 2017
+ * @version	1.2b
  */
 unsigned char printAt(unsigned short xy) __z88dk_fastcall
 {
 	__asm
 	ld b,h
 	ld c,l
-	ld hl,($400c)
-	inc hl
+	ld hl,(_DFILE)
+	inc l
 	add hl,bc
 	ld bc,_text
 	CHAROUT:

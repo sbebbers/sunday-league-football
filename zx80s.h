@@ -4,7 +4,7 @@
  * @author:     Shaun B
  * @version:    1.0.4 - 2017-08-21
  *
- **/
+ */
 
 /// Pre-processor symbols:
 #define CLEAR		0x00
