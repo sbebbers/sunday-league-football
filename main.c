@@ -140,7 +140,7 @@ unsigned char startGame()
 {
 	unsigned char yn[2];
 	unsigned char _manager[16];
-	prompt("please enter your name\n(max 16 characters, no spaces)", 8);
+	prompt("please enter your name\n(max 16 characters)", 8);
 	_manager[0] = CLEAR;
 	gets(_manager);
 	if(!_manager[0])
