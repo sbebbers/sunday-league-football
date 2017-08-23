@@ -276,14 +276,14 @@ unsigned char cls()
 {
 	__asm
 	exx
-	ld hl,(_DFILE)
+	ld hl,($400c)
 	ld bc,$0300
 	ld d,$21
 	inc l
 	CLS:
 		dec d
 		jr z,NEWLINE
-		ld (hl),_CLEAR
+		ld (hl),$00
 	DECC:
 		inc hl
 		dec c
@@ -294,7 +294,7 @@ unsigned char cls()
 		jr z,EXIT
 		jr CLS
 	NEWLINE:
-		ld (hl),_NL
+		ld (hl),$76
 		ld d,$21
 		jr DECC
 	EXIT:
@@ -319,7 +319,7 @@ unsigned char printAt(unsigned short xy) __z88dk_fastcall
 	__asm
 	ld b,h
 	ld c,l
-	ld hl,(_DFILE)
+	ld hl,($400c)
 	inc l
 	add hl,bc
 	ld bc,_text
