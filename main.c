@@ -70,6 +70,7 @@
 #define NL			0x76
 #define EOF			0xff
 #define DFILE		$400c
+#define STRBFSIZE	0x20
 
 /**
  * Function prototypes
@@ -130,16 +131,21 @@ int main()
 /**
  * Game starts here, sets player's name
  * and also prompts for instructions
+ * STRBFSIZE is used as a reasonable limiter
+ * for the number of characters that the
+ * user may enter; anything above this
+ * and it will cause unpredictable
+ * effects
  *
  * @param	na
  * @author	sbebbington
  * @date	21 Aug 20171
- * @version	1.0
+ * @version	1.1
  */
 unsigned char startGame()
 {
-	unsigned char yn[2];
-	unsigned char _manager[16];
+	unsigned char yn[STRBFSIZE];
+	unsigned char _manager[STRBFSIZE];
 	prompt("please enter your name\n(max 16 characters)", 8);
 	_manager[0] = CLEAR;
 	gets(_manager);
@@ -147,13 +153,13 @@ unsigned char startGame()
 	{
 		main();
 	}
-	c = 0;
-	while(_manager[c])
+	c = 15;
+	while(c != 0xff)
 	{
 		manager[c] = _manager[c];
-		c++;
+		c--;
 	}
-	manager[c] = CLEAR;
+	manager[16] = CLEAR;
 	cls();
 	printf("welcome %s\n", manager);
 	prompt("would you like instructions Y/N?",0);
