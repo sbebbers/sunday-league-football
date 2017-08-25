@@ -70,18 +70,20 @@
 #define NL			0x76
 #define EOF			0xff
 #define DFILE		$400c
+#define STRBFSIZE	0x20
 
 /**
  * Function prototypes
  */
 int main();
-unsigned char zx80Init();
+void zx80Init();
+void cls();
+void startGame();
+void gameManager();
+void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
-unsigned char cls();
 unsigned char printAt(unsigned short xy);
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv);
-unsigned char startGame();
-void preSeasonPrompt();
 
 /**
  * Globals
@@ -107,14 +109,33 @@ unsigned char c;
 unsigned char text[33];
 unsigned char manager[16];
 
-signed long money = 10000;
+signed long money = 1;
+unsigned char week;
+unsigned char year;
+unsigned char league;
+
+unsigned char numberOfPlayers;
+unsigned char leaguePosition;
+unsigned char cupRun;
+
+unsigned short numberOfFans;
+unsigned short income;
+unsigned short expenses;
+unsigned short matchAppearanceFee;
+
+/**
+ * Dictionary look-up to save bytes
+ */
+unsigned char the[]			= "the";
+unsigned char you[]			= "you";
+unsigned char and[]			= "and";
 
 /**
  * Main entry point of game
  *
  * @param	na
  * @author	sbebbington
- * @date	21 Aug 20171
+ * @date	21 Aug 2017
  * @version	1.2
  */
 int main()
@@ -130,60 +151,92 @@ int main()
 /**
  * Game starts here, sets player's name
  * and also prompts for instructions
+ * STRBFSIZE is used as a reasonable limiter
+ * for the number of characters that the
+ * user may enter; anything above this
+ * and it will cause unpredictable
+ * effects
  *
  * @param	na
  * @author	sbebbington
- * @date	21 Aug 20171
- * @version	1.0
+ * @date	23 Aug 2017
+ * @version	1.1
  */
-unsigned char startGame()
+void startGame()
 {
-	unsigned char yn[2];
-	unsigned char _manager[16];
-	prompt("please enter your name\n(max 16 characters)", 8);
-	_manager[0] = CLEAR;
-	gets(_manager);
-	if(!_manager[0])
+	unsigned char _strBuffer[STRBFSIZE];
+	prompt("enter your name\n(max 16 characters)", 8);
+	gets(_strBuffer);
+	if(!_strBuffer[0])
 	{
 		main();
 	}
-	c = 0;
-	while(_manager[c])
+	
+	c = 15;
+	while(c != EOF)
 	{
-		manager[c] = _manager[c];
-		c++;
+		manager[c] = _strBuffer[c];
+		c--;
 	}
-	manager[c] = CLEAR;
+	manager[16]		= CLEAR;
+	_strBuffer[0]	= CLEAR;
 	cls();
+	
 	printf("welcome %s\n", manager);
-	prompt("would you like instructions Y/N?",0);
-	gets(yn);
-	if(yn[0] == 121)
+	prompt("would you like instructions Y/N?", CLEAR);
+	gets(_strBuffer);
+	if(_strBuffer[0] == 121)
 	{
 		cls();
 		preSeasonPrompt();
+		prompt("",0);
+		gets(_strBuffer);
 	}
+	gameManager();
+}
+
+/**
+ * This will work out at which point in the
+ * season the player is and therefore call
+ * the relevant functions or sub routines
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	23 Aug 2017
+ * @version	1.0
+ */
+void gameManager()
+{
+	unsigned char _strBuffer[STRBFSIZE];
+	unsigned char gameBegins = 1;
+	cls();
 	while(money)
 	{
-		// game here
-		money -= 5;
+		if(gameBegins)
+		{
+			gameBegins--;
+			money	= 12500;
+			week	= 1;
+			year	= 1;
+			league	= 4;
+		}
+		money--;
 	}
 }
 
 /**
  * Basic instructions, probably typos therein
+ * Now uses a dictionary look-up table to save
+ * some bytes
  *
  * @param	na
  * @author	sbebbington
- * @date	18 Aug 20171
- * @version	1.0
+ * @date	23 Aug 2017
+ * @version	1.1
  */
 void preSeasonPrompt()
 {
-	unsigned char ret = CLEAR;
-	printf("welcome to one of\nthe toughest jobs in football.\nyour task is simple, to build\na new team for the ARSENIC\nCHEMICALS LTD. 2nd division and\ntake them to the ARSENIC\nCHEMICALS LTD. PRO LEAGUE.\nthere is also the sweet fa\nchallenge cup sponsored by\nBATRACHOTOXIN DRINKS CO which\ncould see your new team head\nall the way to the national\nstadium.\nyou start with £10,000 in cash,pre-season, you must sign\nplayers and establish a fan\nbase by playing friendlies. thenthe big season kicks off with\na mid-season transfer window to\ntake advantage of. if you are\nnot bankrupt by the end of the\nseason, you can do it all again\nwith your established team so\nthings should be easier.\ngood luck. press enter\n");
-	prompt("",0);
-	gets(ret);
+	printf("it's tough at %s top. %sr taskis to build a new team for %s\nARSENIC CHEMICALS LTD.\n3rd division %s take %sm all\n%s way to %s ARSENIC\nCHECMICALS LTD. PRO LEAGUE.\nas a member of this new division%s must scout for players,\nbuild a fan base, %s prepare\n%sr team for %s season ahead,\nwhich will include playing for\n%s BATHRACHOTOXIN DRINKS CO\nchallenge cup. %s will start\nwith £12,250 %s must prepare\nfor friendlies before %s big\nkick off. buy %s sell players\nwhen transfer windows are\nopen %s make lots of money.\ngood luck. PRESS ENTER\n", the, you, the, and, the, the, the, you, and, you, the, the, you, the, the, you, and, the, and, and);
 }
 
 /**
@@ -194,7 +247,7 @@ void preSeasonPrompt()
  *
  * @param	na
  * @author	sbebbington
- * @date	21 Aug 20171
+ * @date	21 Aug 2017
  * @version	1.0
  */
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv)
@@ -222,10 +275,10 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
  *
  * @param	na
  * @author	sbebbington
- * @date	20 Aug 20171
+ * @date	20 Aug 2017
  * @version	1.0
  */
-unsigned char zx80Init()
+void zx80Init()
 {
 	text[0] = EOF;
 	for(c = 24; c > 0; c--)
@@ -272,18 +325,18 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
  * @todo	Should be able to increase just the L
  * 			register of the DFILE
  */
-unsigned char cls()
+void cls()
 {
 	__asm
 	exx
-	ld hl,(_DFILE)
+	ld hl,($400c)
 	ld bc,$0300
 	ld d,$21
 	inc l
 	CLS:
 		dec d
 		jr z,NEWLINE
-		ld (hl),_CLEAR
+		ld (hl),$00
 	DECC:
 		inc hl
 		dec c
@@ -294,7 +347,7 @@ unsigned char cls()
 		jr z,EXIT
 		jr CLS
 	NEWLINE:
-		ld (hl),_NL
+		ld (hl),$76
 		ld d,$21
 		jr DECC
 	EXIT:
@@ -319,7 +372,7 @@ unsigned char printAt(unsigned short xy) __z88dk_fastcall
 	__asm
 	ld b,h
 	ld c,l
-	ld hl,(_DFILE)
+	ld hl,($400c)
 	inc l
 	add hl,bc
 	ld bc,_text
