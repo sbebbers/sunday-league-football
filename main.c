@@ -76,14 +76,14 @@
  * Function prototypes
  */
 int main();
-unsigned char zx80Init();
-unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
-unsigned char cls();
-unsigned char printAt(unsigned short xy);
-unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv);
-unsigned char startGame();
+void zx80Init();
+void cls();
+void startGame();
 void gameManager();
 void preSeasonPrompt();
+unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
+unsigned char printAt(unsigned short xy);
+unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv);
 
 /**
  * Globals
@@ -162,7 +162,7 @@ int main()
  * @date	23 Aug 2017
  * @version	1.1
  */
-unsigned char startGame()
+void startGame()
 {
 	unsigned char _strBuffer[STRBFSIZE];
 	prompt("enter your name\n(max 16 characters)", 8);
@@ -278,7 +278,7 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
  * @date	20 Aug 2017
  * @version	1.0
  */
-unsigned char zx80Init()
+void zx80Init()
 {
 	text[0] = EOF;
 	for(c = 24; c > 0; c--)
@@ -325,7 +325,7 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
  * @todo	Should be able to increase just the L
  * 			register of the DFILE
  */
-unsigned char cls()
+void cls()
 {
 	__asm
 	exx
