@@ -296,9 +296,9 @@ void preSeasonOptions()
 	unsigned char actionNumber	= 5;
 	unsigned char inverse		= 1;
 	unsigned char validAction	= 0;
-	unsigned char y				= 3;
+	unsigned char y				= 4;
 	
-	printf("number of players: %d", numberOfPlayers);
+	printf("number of players: %d\nmoney £%ld", numberOfPlayers, money);
 	
 	if(teamName[0] == EOF)
 	{
