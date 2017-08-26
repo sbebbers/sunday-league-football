@@ -80,6 +80,8 @@ void zx80Init();
 void cls();
 void startGame();
 void gameManager();
+void preSeasonOptions();
+void scoutForPlayers();
 void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
 unsigned char printAt(unsigned short xy);
@@ -104,23 +106,66 @@ unsigned char gameName[31] =
 {
 	_S, _U, _N, _D, _A, _Y, CLEAR , _L, _E, _A, _G, _U, _E, CLEAR, _F , _O, _O, _T, _B, _A, _L, _L, CLEAR, _M, _A, _N, _A, _G, _E, _R, EOF
 };
+/**
+ * Game prompts
+ */
+unsigned char optionOnePreSeasonMsg[] =
+{
+	ONE, CBRACKET, CLEAR, _C, _H, _O, _O, _S, _E, CLEAR, _T, _E, _A, _M, CLEAR, _N, _A, _M, _E, EOF
+};
+unsigned char optionTwoPreSeasonMsg[] =
+{
+	TWO, CBRACKET, CLEAR, _S, _C, _O, _U, _T, CLEAR, _F, _O, _R, CLEAR, _P, _L, _A, _Y, _E, _R, _S, EOF
+};
+unsigned char optionThreePreSeasonMsg[] =
+{
+	THREE, CBRACKET, CLEAR, _V, _I, _E, _W, CLEAR, _C, _U, _R, _R, _E, _N, _T, CLEAR, _S, _Q, _U, _A, _D, EOF
+};
+unsigned char optionFourPreSeasonMsg[] =
+{
+	FOUR, CBRACKET, CLEAR, _C, _A, _L, _L, CLEAR, _T, _R, _A, _I, _N, _I, _N, _G, CLEAR, _S, _E, _S, _S, _I, _O, _N, EOF
+};
+unsigned char optionFivePreSeasonMsg[] =
+{
+	FIVE, CBRACKET, CLEAR, _B, _U, _Y, CLEAR, _K, _I, _T, EOF
+};
+unsigned char optionSixPreSeasonMsg[] =
+{
+	SIX, CBRACKET, CLEAR, _B, _U, _Y, CLEAR, _S, _Q, _U, _A, _D, CLEAR, _M, _I, _N, _I, _B, _U, _S, EOF
+};
+unsigned char optionSevenPreSeasonMsg[] =
+{
+	SEVEN, CBRACKET, CLEAR, _C, _H, _O, _O, _S, _E, CLEAR, _H, _O, _M, _E, CLEAR, _G, _R, _O, _U, _N, _D, EOF
+};
 
 unsigned char c;
 unsigned char text[33];
 unsigned char manager[16];
+unsigned char teamName[16];
 
-signed long money = 1;
+signed long money				= 1;
 unsigned char week;
 unsigned char year;
 unsigned char league;
 
-unsigned char numberOfPlayers;
-unsigned char leaguePosition;
-unsigned char cupRun;
+unsigned char numberOfPlayers	= 0;
+unsigned char noOfGoalKeepers	= 0;
+unsigned char noOfDefenders		= 0;
+unsigned char noOfMidFielders	= 0;
+unsigned char noOfStrikers		= 0;
+unsigned char defenceRating		= 0;
+unsigned char midfieldRating	= 0;
+unsigned char attackRating		= 0;
+unsigned char homeGroundRent	= 0;
 
-unsigned short numberOfFans;
-unsigned short income;
-unsigned short expenses;
+unsigned char leaguePosition	= 0;
+unsigned char cupRun			= 0;
+unsigned char kitPurchased		= 0;
+unsigned char minibusPurchased	= 0;
+
+unsigned short numberOfFans		= 0;
+unsigned short income			= 0;
+unsigned short expenses			= 0;
 unsigned short matchAppearanceFee;
 
 /**
@@ -209,19 +254,108 @@ void gameManager()
 {
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char gameBegins = 1;
-	cls();
+	unsigned long weekNumber = 1;
+	
 	while(money)
 	{
+		cls();
+		printf("game status ");
 		if(gameBegins)
 		{
 			gameBegins--;
-			money	= 12500;
-			week	= 1;
-			year	= 1;
-			league	= 4;
+			money			= 12500;
+			week			= 1;
+			year			= 1;
+			league			= 4;
+			numberOfPlayers	= 0;
+			numberOfFans	= 0;
+			teamName[0]		= EOF;
+		}
+		
+		if(week < 7)
+		{
+			printf("pre-season\n");
+			preSeasonOptions();
+			week++;
 		}
 		money--;
 	}
+}
+
+/**
+ * Shows the available pre-season options
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	26 Aug 2017
+ * @version	1.0
+ */
+void preSeasonOptions()
+{
+	unsigned char _strBuffer[STRBFSIZE];
+	unsigned char actionNumber	= 5;
+	unsigned char inverse		= 1;
+	unsigned char validAction	= 0;
+	unsigned char y				= 3;
+	
+	printf("number of players: %d", numberOfPlayers);
+	
+	if(teamName[0] == EOF)
+	{
+		setText(optionOnePreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	else
+	{
+		printf("\nteam name: %s", teamName);
+	}
+	setText(optionTwoPreSeasonMsg, 0, ++y, (++inverse)%2);
+	if(numberOfPlayers)
+	{
+		setText(optionThreePreSeasonMsg, 0, ++y, (++inverse)%2);
+		setText(optionFourPreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	if(!kitPurchased)
+	{
+		setText(optionFivePreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	if(!minibusPurchased)
+	{
+		setText(optionSixPreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	if(!homeGroundRent)
+	{
+		setText(optionSevenPreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	prompt("choose your option", ++y);
+	
+	while(_strBuffer[0] < 49 || _strBuffer[0] > 56)
+	{
+		gets(_strBuffer);
+	}
+	y	= _strBuffer[0]-48;
+	if(y == 1 && teamName[0] == EOF)
+	{
+		prompt("enter your team name", CLEAR);
+		gets(_strBuffer);
+		y = 15;
+		while(y != EOF)
+		{
+			teamName[y] = _strBuffer[y];
+			y--;
+		}
+		teamName[16]	= CLEAR;
+		cls();
+		preSeasonOptions();
+	}
+	if(y == 2)
+	{
+		scoutForPlayers();
+	}
+	gets(_strBuffer);
+}
+
+void scoutForPlayers()
+{
 }
 
 /**

@@ -53,3 +53,5 @@ dkms.conf
 /.project
 
 main.asm
+test.c
+.gitignore
