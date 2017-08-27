@@ -161,7 +161,7 @@ unsigned char teamName[16];
 signed long money				= 1;
 unsigned char year;
 unsigned char league;
-unsigned short entrophy			= 1;
+unsigned short entropy			= 1;
 
 unsigned char numberOfPlayers	= 0;
 unsigned char noOfGoalKeepers	= 0;
@@ -286,7 +286,7 @@ void startGame()
 	{
 		manager[y] = _strBuffer[y];
 		y--;
-		++entrophy;
+		++entropy;
 	}
 	manager[16]		= CLEAR;
 	_strBuffer[0]	= CLEAR;
@@ -301,7 +301,7 @@ void startGame()
 		preSeasonPrompt();
 		prompt("",0);
 		gets(_strBuffer);
-		++entrophy;
+		++entropy;
 	}
 	gameManager();
 }
@@ -396,7 +396,7 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 		gets(_strBuffer);
 	}
 	y	= _strBuffer[0]-48;
-	entrophy += y;
+	entropy += y;
 	
 	if(y == 1 && teamName[0] == EOF)
 	{
@@ -418,7 +418,7 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 	if(y == 3)
 	{
 		viewSquad();
-		++entrophy;
+		++entropy;
 	}
 	if(y == 4)
 	{
@@ -447,15 +447,15 @@ void scoutForPlayers()
 	unsigned char playerName[12];
 	cls();
 	
-	playerName[0]	= _A + srand(entrophy)%25;
+	playerName[0]	= _A + srand(entropy)%25;
 	playerName[1]	= CLEAR;
 	if(noOfGoalKeepers < 3)
 	{
-		y = srand(entrophy)%35;
+		y = srand(entropy)%35;
 		x = 2;
 		while(goalKeepers[y++] != EOF)
 		{
-			++entrophy;
+			++entropy;
 		}
 		
 		while(goalKeepers[y] != EOF)
@@ -465,7 +465,7 @@ void scoutForPlayers()
 		playerName[x]		= EOF;
 		setText(signKeeper, 0, 0, 0);
 		setText(playerName, 18, 0, 1);
-		x = 10 + srand(entrophy)%240;
+		x = 10 + srand(entropy)%240;
 		while(x%5)
 		{
 			x++;
@@ -508,7 +508,7 @@ void trainingSession()
 	cls();
 	for(x; x > 0; x--)
 	{
-		teamRatings[x-1] += srand(++entrophy)%2;
+		teamRatings[x-1] += srand(++entropy)%2;
 	}
 	setText(teamRatings,0, 0, 0);
 	gets(_strBuffer);
@@ -551,7 +551,7 @@ void viewSquad()
 			printf("\n");
 		}
 	}
-	++entrophy;
+	++entropy;
 	prompt("press new line", ++y);
 	gets(_strBuffer);
 }
@@ -569,7 +569,7 @@ void viewSquad()
 void preSeasonPrompt()
 {
 	printf("it's tough at %s top. %sr taskis to build a new team for %s\nARSENIC CHEMICALS LTD.\n3rd division %s take %sm all\n%s way to %s ARSENIC\nCHECMICALS LTD. PRO LEAGUE.\nas a member of this new division%s must scout for players,\nbuild a fan base, %s prepare\n%sr team for %s season ahead,\nwhich will include playing for\n%s BATHRACHOTOXIN DRINKS CO\nchallenge cup. %s will start\nwith £12,250 %s must prepare\nfor friendlies before %s big\nkick off. buy %s sell players\nwhen transfer windows are\nopen %s make lots of money.\ngood luck. PRESS ENTER\n", the, you, the, and, the, the, the, you, and, you, the, the, you, the, the, you, and, the, and, and);
-	++entrophy;
+	++entropy;
 }
 
 /**
@@ -588,7 +588,7 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
 	unsigned char c = 0;
 	while(txt[c] != EOF)
 	{
-		++entrophy;
+		++entropy;
 		if(inv)
 		{
 			text[c] = INVERSE(txt[c]);
@@ -639,7 +639,7 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
 	unsigned char y;
 	if(lineNumber)
 	{
-		++entrophy;
+		++entropy;
 		for(y = lineNumber; y > 0; y--)
 		{
 			printf("\n");
@@ -691,7 +691,7 @@ void cls()
 	call $0747
 	exx
 	__endasm;
-	++entrophy;
+	++entropy;
 }
 
 /**
