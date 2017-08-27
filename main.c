@@ -80,6 +80,10 @@ void zx80Init();
 void cls();
 void startGame();
 void gameManager();
+void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber);
+void scoutForPlayers();
+void trainingSession();
+void viewSquad();
 void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
 unsigned char printAt(unsigned short xy);
@@ -104,23 +108,78 @@ unsigned char gameName[31] =
 {
 	_S, _U, _N, _D, _A, _Y, CLEAR , _L, _E, _A, _G, _U, _E, CLEAR, _F , _O, _O, _T, _B, _A, _L, _L, CLEAR, _M, _A, _N, _A, _G, _E, _R, EOF
 };
+/**
+ * Game prompts
+ */
+unsigned char optionOnePreSeasonMsg[] =
+{
+	ONE, CBRACKET, CLEAR, _C, _H, _O, _O, _S, _E, CLEAR, _T, _E, _A, _M, CLEAR, _N, _A, _M, _E, EOF
+};
+unsigned char optionTwoPreSeasonMsg[] =
+{
+	TWO, CBRACKET, CLEAR, _S, _C, _O, _U, _T, CLEAR, _F, _O, _R, CLEAR, _P, _L, _A, _Y, _E, _R, _S, EOF
+};
+unsigned char optionThreePreSeasonMsg[] =
+{
+	THREE, CBRACKET, CLEAR, _V, _I, _E, _W, CLEAR, _C, _U, _R, _R, _E, _N, _T, CLEAR, _S, _Q, _U, _A, _D, EOF
+};
+unsigned char optionFourPreSeasonMsg[] =
+{
+	FOUR, CBRACKET, CLEAR, _C, _A, _L, _L, CLEAR, _T, _R, _A, _I, _N, _I, _N, _G, CLEAR, _S, _E, _S, _S, _I, _O, _N, EOF
+};
+unsigned char optionFivePreSeasonMsg[] =
+{
+	FIVE, CBRACKET, CLEAR, _B, _U, _Y, CLEAR, _K, _I, _T, EOF
+};
+unsigned char optionSixPreSeasonMsg[] =
+{
+	SIX, CBRACKET, CLEAR, _B, _U, _Y, CLEAR, _S, _Q, _U, _A, _D, CLEAR, _M, _I, _N, _I, _B, _U, _S, EOF
+};
+unsigned char optionSevenPreSeasonMsg[] =
+{
+	SEVEN, CBRACKET, CLEAR, _C, _H, _O, _O, _S, _E, CLEAR, _H, _O, _M, _E, CLEAR, _G, _R, _O, _U, _N, _D, EOF
+};
 
-unsigned char c;
+/**
+ * Sign players prompt
+ */
+unsigned char signKeeper[] =
+{
+	_S, _I, _G, _N, CLEAR, _G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
+};
+
+/**
+ * String buffers
+ */
 unsigned char text[33];
 unsigned char manager[16];
+unsigned char teamName[16];
 
-signed long money = 1;
-unsigned char week;
+/**
+ * Game variables
+ */
+signed long money				= 1;
 unsigned char year;
 unsigned char league;
+unsigned short entropy			= 1;
 
-unsigned char numberOfPlayers;
-unsigned char leaguePosition;
-unsigned char cupRun;
+unsigned char numberOfPlayers	= 0;
+unsigned char noOfGoalKeepers	= 0;
+unsigned char noOfDefenders		= 0;
+unsigned char noOfMidFielders	= 0;
+unsigned char noOfStrikers		= 0;
+unsigned char defenceRating		= 0;
+unsigned char midfieldRating	= 0;
+unsigned char attackRating		= 0;
+unsigned char homeGroundRent	= 0;
 
-unsigned short numberOfFans;
-unsigned short income;
-unsigned short expenses;
+unsigned char leaguePosition	= 0;
+unsigned char cupRun			= 0;
+unsigned char kitPurchased		= 0;
+unsigned char minibusPurchased	= 0;
+
+unsigned short income			= 0;
+unsigned short expenses			= 0;
 unsigned short matchAppearanceFee;
 
 /**
@@ -129,6 +188,56 @@ unsigned short matchAppearanceFee;
 unsigned char the[]			= "the";
 unsigned char you[]			= "you";
 unsigned char and[]			= "and";
+
+/**
+ * Players
+ */
+unsigned char goalKeepers[44]	= 
+{
+	EOF, _A, _N, _D, _R, _E, _W, _S, EOF, _J, _O, _N, _E, _S, EOF, _S, _M, _I, _T, _H, EOF, _A, _D, _L, _I, _M, EOF, _B, _A, _C, _O, _N, EOF, _H, _U, _L, _L, EOF, _C, _O, _N, _A, _N, EOF
+};
+unsigned char defenders[81]		=
+{
+	EOF, _D, _A, _V, _I, _S, EOF, _J, _O, _H, _N, _S, _O, _N, EOF, _P, _I, _K, _E, EOF, _S, _M, _Y, _T, _H, EOF, _L, _E, _S, _T, _E, _R, EOF, _W, _E, _S, _T, _L, _Y, EOF, _Z, _E, _D, _D, _Y, EOF, _Y, _O, _U, _N, _G, EOF, _K, _R, _I, _L, _L, EOF, _M, _A, _R, _T, _Y, _N, EOF, _N, _I, _C, _H, _O, _L, _L, _S, EOF, _A, _D, _D, _E, _R, _S, EOF
+};
+unsigned char midfielders[87]	=
+{
+	EOF, _S, _C, _O, _T, _T, EOF, _S, _A, _N, _D, _B, _A, _C, _H, EOF, _R, _I, _C, _H, _A, _R, _D, _S, EOF, _D, _E, _N, _N, _I, _S, EOF, _J, _A, _M, _E, _S, _O, _N, EOF, _B, _O, _B, _S, EOF, _C, _A, _U, _L, _D, _W, _E, _L, _L, EOF, _V, _I, _V, EOF, _R, _U, _T, _T, _E, _R, EOF, _B, _E, _N, _N, _E, _T, _T, EOF, _R, _O, _Y, _L, _E, EOF, _P, _I, _N, _D, _E, _R, EOF
+};
+unsigned char strikers[79]		=
+{
+	EOF, _L, _Y, _O, _N, _S, EOF, _O, _N, _I, _O, _N, _S, EOF, _F, _I, _F, _E, EOF, _R, _A, _N, _D, _S, EOF, _S, _T, _A, _R, _R, EOF, _G, _O, _R, _D, _O, _N, EOF, _C, _L, _I, _V, _E, EOF, _S, _I, _N, _C, _L, _A, _I, _R, EOF, _X, _Y, _L, _O, _N, EOF, _C, _U, _L, _L, _E, _N, EOF, _B, _R, _A, _N, _D, _S, EOF, _H, _A, _N, _T, _S, EOF
+};
+
+/**
+ * Team builders
+ */
+unsigned char teamKeepers[32]	= 
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
+};
+unsigned char teamDefenders[53] =
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF
+};
+unsigned char teamMidFielders[53] = 
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF
+};
+unsigned char teamStrikers[26] =
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
+};
+
+unsigned char teamRatings[17] =
+{
+	ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, EOF
+};
+
 
 /**
  * Main entry point of game
@@ -165,18 +274,19 @@ int main()
 void startGame()
 {
 	unsigned char _strBuffer[STRBFSIZE];
-	prompt("enter your name\n(max 16 characters)", 8);
+	unsigned char y = 15;
+	prompt("enter your name", 8);
 	gets(_strBuffer);
 	if(!_strBuffer[0])
 	{
 		main();
 	}
 	
-	c = 15;
-	while(c != EOF)
+	while(y != EOF)
 	{
-		manager[c] = _strBuffer[c];
-		c--;
+		manager[y] = _strBuffer[y];
+		y--;
+		++entropy;
 	}
 	manager[16]		= CLEAR;
 	_strBuffer[0]	= CLEAR;
@@ -191,6 +301,7 @@ void startGame()
 		preSeasonPrompt();
 		prompt("",0);
 		gets(_strBuffer);
+		++entropy;
 	}
 	gameManager();
 }
@@ -209,19 +320,240 @@ void gameManager()
 {
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char gameBegins = 1;
-	cls();
+	unsigned long weekNumber = 1;
+	
 	while(money)
 	{
 		if(gameBegins)
 		{
 			gameBegins--;
-			money	= 12500;
-			week	= 1;
-			year	= 1;
-			league	= 4;
+			money			= 12500;
+			year			= 1;
+			league			= 4;
+			numberOfPlayers	= 0;
+			expenses		= 0;
+			teamName[0]		= EOF;
 		}
-		money--;
+		
+		if(weekNumber < 7)
+		{
+			preSeasonOptions(5, weekNumber);
+			weekNumber++;
+		}
+		money -= expenses;
 	}
+}
+
+/**
+ * Shows the available pre-season options
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	26 Aug 2017
+ * @version	1.0
+ */
+void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
+{
+	unsigned char _strBuffer[STRBFSIZE];
+	unsigned char inverse		= 1;
+	unsigned char y				= 5;
+	cls();
+	printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", weekNumber, numberOfPlayers, money);
+	
+	if(teamName[0] == EOF)
+	{
+		setText(optionOnePreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	else
+	{
+		printf("\nteam name: %s", teamName);
+	}
+	if(numberOfPlayers < 18)
+	{
+		setText(optionTwoPreSeasonMsg, 0, ++y, (++inverse)%2);
+	} 
+	if(numberOfPlayers)
+	{
+		setText(optionThreePreSeasonMsg, 0, ++y, (++inverse)%2);
+		setText(optionFourPreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	if(!kitPurchased)
+	{
+		setText(optionFivePreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	if(!minibusPurchased)
+	{
+		setText(optionSixPreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	if(!homeGroundRent)
+	{
+		setText(optionSevenPreSeasonMsg, 0, ++y, (++inverse)%2);
+	}
+	prompt("choose your option", ++y);
+	
+	while(_strBuffer[0] < 49 || _strBuffer[0] > 56)
+	{
+		gets(_strBuffer);
+	}
+	y	= _strBuffer[0]-48;
+	entropy += y;
+	
+	if(y == 1 && teamName[0] == EOF)
+	{
+		prompt("enter your team name", CLEAR);
+		gets(_strBuffer);
+		y = 15;
+		while(y != EOF)
+		{
+			teamName[y] = _strBuffer[y];
+			y--;
+		}
+		teamName[16]	= CLEAR;
+	}
+	if(y == 2)
+	{
+		scoutForPlayers();
+		actionNumber--;
+	}
+	if(y == 3)
+	{
+		viewSquad();
+		++entropy;
+	}
+	if(y == 4)
+	{
+		trainingSession();
+		actionNumber = 0;
+	}
+	if(!actionNumber)
+	{
+		return;
+	}
+	preSeasonOptions(actionNumber, weekNumber);
+}
+
+/**
+ * Sets up teams by signing players
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	27 Aug 2017
+ * @version	1.2
+ */
+void scoutForPlayers()
+{	
+	unsigned char _strBuffer[STRBFSIZE];
+	unsigned char x, y;
+	unsigned char playerName[12];
+	cls();
+	
+	playerName[0]	= _A + srand(entropy)%25;
+	playerName[1]	= CLEAR;
+	if(noOfGoalKeepers < 3)
+	{
+		y = srand(entropy)%35;
+		x = 2;
+		while(goalKeepers[y++] != EOF)
+		{
+			++entropy;
+		}
+		
+		while(goalKeepers[y] != EOF)
+		{
+			playerName[x++]	= goalKeepers[y++];
+		}
+		playerName[x]		= EOF;
+		setText(signKeeper, 0, 0, 0);
+		setText(playerName, 18, 0, 1);
+		x = 10 + srand(entropy)%240;
+		while(x%5)
+		{
+			x++;
+		}
+		printf("for £%d Y/N", x);
+		prompt("", 1);
+		gets(_strBuffer);
+		if(_strBuffer[0] == 121)
+		{
+			money -= x;
+			numberOfPlayers++;
+			noOfGoalKeepers++;
+			y = 0;
+			for(x = 0; x < noOfGoalKeepers; x++)
+			{
+				while(teamKeepers[y++] != EOF){}
+			}
+			x = 0;
+			while(playerName[x] != EOF)
+			{
+				teamKeepers[y++]	= playerName[x++];
+			}
+		}
+	}
+}
+
+/**
+ * Runs a training session to improve
+ * player ratings
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	27 Aug 2017
+ * @version	1.1
+ */
+void trainingSession()
+{
+	unsigned char _strBuffer[STRBFSIZE], x;
+	x = numberOfPlayers;
+	cls();
+	for(x; x > 0; x--)
+	{
+		teamRatings[x-1] += srand(++entropy)%2;
+	}
+	setText(teamRatings,0, 0, 0);
+	gets(_strBuffer);
+//		
+//	}
+//	printf("\ntraining session ended\nview squad to see which players have improved")
+//	prompt("",1);
+//	
+}
+
+/**
+ * Shows the current squad of players
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	27 Aug 2017
+ * @version	1.1
+ */
+void viewSquad()
+{
+	unsigned char _strBuffer[STRBFSIZE], x, y, p, inverse, z;
+	y = 1;
+	cls();
+	if(noOfGoalKeepers){
+		p = 1;
+		printf("goal keepers:   rating:");
+		for(x = noOfGoalKeepers; x > 0; x--)
+		{
+			z = 0;
+			while(teamKeepers[p] != EOF)
+			{
+				_strBuffer[z++]	= teamKeepers[p++];
+			}
+			_strBuffer[z]	= EOF;
+			p++;
+			setText(_strBuffer, 0, ++y, (++inverse)%2);
+			_strBuffer[0]	= teamRatings[y-2];
+			_strBuffer[1]	= EOF;
+			setText(_strBuffer, 16, y, inverse%2);
+			printf("\n");
+		}
+	}
+	++entropy;
+	prompt("press new line", ++y);
+	gets(_strBuffer);
 }
 
 /**
@@ -237,6 +569,7 @@ void gameManager()
 void preSeasonPrompt()
 {
 	printf("it's tough at %s top. %sr taskis to build a new team for %s\nARSENIC CHEMICALS LTD.\n3rd division %s take %sm all\n%s way to %s ARSENIC\nCHECMICALS LTD. PRO LEAGUE.\nas a member of this new division%s must scout for players,\nbuild a fan base, %s prepare\n%sr team for %s season ahead,\nwhich will include playing for\n%s BATHRACHOTOXIN DRINKS CO\nchallenge cup. %s will start\nwith £12,250 %s must prepare\nfor friendlies before %s big\nkick off. buy %s sell players\nwhen transfer windows are\nopen %s make lots of money.\ngood luck. PRESS ENTER\n", the, you, the, and, the, the, the, you, and, you, the, the, you, the, the, you, and, the, and, and);
+	++entropy;
 }
 
 /**
@@ -252,9 +585,10 @@ void preSeasonPrompt()
  */
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv)
 {
-	c = 0;
+	unsigned char c = 0;
 	while(txt[c] != EOF)
 	{
+		++entropy;
 		if(inv)
 		{
 			text[c] = INVERSE(txt[c]);
@@ -280,8 +614,9 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
  */
 void zx80Init()
 {
+	unsigned char y;
 	text[0] = EOF;
-	for(c = 24; c > 0; c--)
+	for(y = 24; y > 0; y--)
 	{
 		printf("                                \n");
 	}
@@ -301,9 +636,11 @@ void zx80Init()
  */
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
 {
+	unsigned char y;
 	if(lineNumber)
 	{
-		for(c = lineNumber; c > 0; c--)
+		++entropy;
+		for(y = lineNumber; y > 0; y--)
 		{
 			printf("\n");
 		}
@@ -354,6 +691,7 @@ void cls()
 	call $0747
 	exx
 	__endasm;
+	++entropy;
 }
 
 /**
