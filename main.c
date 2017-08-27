@@ -83,6 +83,8 @@ void gameManager();
 void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber);
 void scoutForPlayers();
 void trainingSession();
+void purchaseMinibus();
+void rentGround();
 void viewSquad();
 void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
@@ -354,82 +356,97 @@ void gameManager()
  */
 void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 {
-	unsigned char _strBuffer[STRBFSIZE];
-	unsigned char inverse		= 1;
-	unsigned char y				= 5;
-	cls();
-	printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", weekNumber, numberOfPlayers, money);
-	
-	if(teamName[0] == EOF)
+	while(actionNumber)
 	{
-		setText(optionOnePreSeasonMsg, 0, ++y, (++inverse)%2);
-	}
-	else
-	{
-		printf("\nteam name: %s", teamName);
-	}
-	if(numberOfPlayers < 18)
-	{
-		setText(optionTwoPreSeasonMsg, 0, ++y, (++inverse)%2);
-	} 
-	if(numberOfPlayers)
-	{
-		setText(optionThreePreSeasonMsg, 0, ++y, (++inverse)%2);
-		setText(optionFourPreSeasonMsg, 0, ++y, (++inverse)%2);
-	}
-	if(!kitPurchased)
-	{
-		setText(optionFivePreSeasonMsg, 0, ++y, (++inverse)%2);
-	}
-	if(!minibusPurchased)
-	{
-		setText(optionSixPreSeasonMsg, 0, ++y, (++inverse)%2);
-	}
-	if(!homeGroundRent)
-	{
-		setText(optionSevenPreSeasonMsg, 0, ++y, (++inverse)%2);
-	}
-	prompt("choose your option", ++y);
-	
-	while(_strBuffer[0] < 49 || _strBuffer[0] > 56)
-	{
-		gets(_strBuffer);
-	}
-	y	= _strBuffer[0]-48;
-	entropy += y;
-	
-	if(y == 1 && teamName[0] == EOF)
-	{
-		prompt("enter your team name", CLEAR);
-		gets(_strBuffer);
-		y = 15;
-		while(y != EOF)
+		unsigned char _strBuffer[STRBFSIZE];
+		unsigned char inverse		= 1;
+		unsigned char y				= 5;
+		cls();
+		printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", weekNumber, numberOfPlayers, money);
+		
+		if(teamName[0] == EOF)
 		{
-			teamName[y] = _strBuffer[y];
-			y--;
+			setText(optionOnePreSeasonMsg, 0, ++y, (++inverse)%2);
 		}
-		teamName[16]	= CLEAR;
+		else
+		{
+			printf("\nteam name: %s", teamName);
+		}
+		if(numberOfPlayers < 18)
+		{
+			setText(optionTwoPreSeasonMsg, 0, ++y, (++inverse)%2);
+		} 
+		if(numberOfPlayers)
+		{
+			setText(optionThreePreSeasonMsg, 0, ++y, (++inverse)%2);
+			setText(optionFourPreSeasonMsg, 0, ++y, (++inverse)%2);
+		}
+		if(!kitPurchased)
+		{
+			setText(optionFivePreSeasonMsg, 0, ++y, (++inverse)%2);
+		}
+		if(!minibusPurchased)
+		{
+			setText(optionSixPreSeasonMsg, 0, ++y, (++inverse)%2);
+		}
+		if(!homeGroundRent)
+		{
+			setText(optionSevenPreSeasonMsg, 0, ++y, (++inverse)%2);
+		}
+		prompt("choose your option", ++y);
+		
+		while(_strBuffer[0] < 49 || _strBuffer[0] > 56)
+		{
+			gets(_strBuffer);
+		}
+		y	= _strBuffer[0]-48;
+		
+		if(y == 1 && teamName[0] == EOF)
+		{
+			prompt("enter your team name", CLEAR);
+			gets(_strBuffer);
+			y = 15;
+			while(y != EOF)
+			{
+				teamName[y] = _strBuffer[y];
+				y--;
+			}
+			teamName[16]	= CLEAR;
+		}
+		cls();
+		if(y == 2)
+		{
+			scoutForPlayers();
+			actionNumber--;
+		}
+		if(y == 3 && numberOfPlayers)
+		{
+			viewSquad();
+		}
+		if(y == 4 && numberOfPlayers)
+		{
+			trainingSession();
+			actionNumber = 0;
+		}
+		if(y == 5)
+		{
+			kitPurchased = 1;
+			printf("kit purchased for full squad\nhome and away at £500");
+			money -= 500;
+			prompt("",1);
+			gets(_strBuffer);
+		}
+		if(y == 6)
+		{
+			minibusPurchased = 1;
+			purchaseMinibus();
+		}
+		if(y == 7)
+		{
+			rentGround();
+		}
+		entropy += y;
 	}
-	if(y == 2)
-	{
-		scoutForPlayers();
-		actionNumber--;
-	}
-	if(y == 3)
-	{
-		viewSquad();
-		++entropy;
-	}
-	if(y == 4)
-	{
-		trainingSession();
-		actionNumber = 0;
-	}
-	if(!actionNumber)
-	{
-		return;
-	}
-	preSeasonOptions(actionNumber, weekNumber);
 }
 
 /**
@@ -445,7 +462,6 @@ void scoutForPlayers()
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char x, y;
 	unsigned char playerName[12];
-	cls();
 	
 	playerName[0]	= _A + srand(entropy)%25;
 	playerName[1]	= CLEAR;
@@ -505,18 +521,28 @@ void trainingSession()
 {
 	unsigned char _strBuffer[STRBFSIZE], x;
 	x = numberOfPlayers;
-	cls();
-	for(x; x > 0; x--)
+ 	for(x; x > 0; x--)
 	{
 		teamRatings[x-1] += srand(++entropy)%2;
 	}
-	setText(teamRatings,0, 0, 0);
+	x = srand(entropy) % 128;
+	while(++x%5){}
+	printf("the training session cost £%d\n\nview squad to see which players have improved",x);
+	money -= x;
+	prompt("",1);
 	gets(_strBuffer);
-//		
-//	}
-//	printf("\ntraining session ended\nview squad to see which players have improved")
-//	prompt("",1);
-//	
+}
+
+void purchaseMinibus()
+{
+	money -= 2500;
+	expenses += 20;
+}
+
+void rentGround()
+{
+	money -= 100;
+	expenses += srand(entropy)%50;
 }
 
 /**
@@ -531,7 +557,6 @@ void viewSquad()
 {
 	unsigned char _strBuffer[STRBFSIZE], x, y, p, inverse, z;
 	y = 1;
-	cls();
 	if(noOfGoalKeepers){
 		p = 1;
 		printf("goal keepers:   rating:");
