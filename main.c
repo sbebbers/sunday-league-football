@@ -80,14 +80,14 @@ void zx80Init();
 void cls();
 void startGame();
 void gameManager();
-void preSeasonOptions();
+void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber);
 void scoutForPlayers();
+void trainingSession();
 void viewSquad();
 void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
 unsigned char printAt(unsigned short xy);
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv);
-unsigned char frameCounter();
 
 /**
  * Globals
@@ -146,7 +146,7 @@ unsigned char optionSevenPreSeasonMsg[] =
 unsigned char signKeeper[] =
 {
 	_S, _I, _G, _N, CLEAR, _G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
-}
+};
 
 /**
  * String buffers
@@ -159,9 +159,9 @@ unsigned char teamName[16];
  * Game variables
  */
 signed long money				= 1;
-unsigned char week;
 unsigned char year;
 unsigned char league;
+unsigned short entrophy			= 1;
 
 unsigned char numberOfPlayers	= 0;
 unsigned char noOfGoalKeepers	= 0;
@@ -199,7 +199,7 @@ unsigned char goalKeepers[44]	=
 unsigned char defenders[81]		=
 {
 	EOF, _D, _A, _V, _I, _S, EOF, _J, _O, _H, _N, _S, _O, _N, EOF, _P, _I, _K, _E, EOF, _S, _M, _Y, _T, _H, EOF, _L, _E, _S, _T, _E, _R, EOF, _W, _E, _S, _T, _L, _Y, EOF, _Z, _E, _D, _D, _Y, EOF, _Y, _O, _U, _N, _G, EOF, _K, _R, _I, _L, _L, EOF, _M, _A, _R, _T, _Y, _N, EOF, _N, _I, _C, _H, _O, _L, _L, _S, EOF, _A, _D, _D, _E, _R, _S, EOF
-}
+};
 unsigned char midfielders[87]	=
 {
 	EOF, _S, _C, _O, _T, _T, EOF, _S, _A, _N, _D, _B, _A, _C, _H, EOF, _R, _I, _C, _H, _A, _R, _D, _S, EOF, _D, _E, _N, _N, _I, _S, EOF, _J, _A, _M, _E, _S, _O, _N, EOF, _B, _O, _B, _S, EOF, _C, _A, _U, _L, _D, _W, _E, _L, _L, EOF, _V, _I, _V, EOF, _R, _U, _T, _T, _E, _R, EOF, _B, _E, _N, _N, _E, _T, _T, EOF, _R, _O, _Y, _L, _E, EOF, _P, _I, _N, _D, _E, _R, EOF
@@ -235,7 +235,7 @@ unsigned char teamStrikers[26] =
 
 unsigned char teamRatings[17] =
 {
-	ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, CLEAR
+	ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, EOF
 };
 
 
@@ -286,6 +286,7 @@ void startGame()
 	{
 		manager[y] = _strBuffer[y];
 		y--;
+		++entrophy;
 	}
 	manager[16]		= CLEAR;
 	_strBuffer[0]	= CLEAR;
@@ -300,6 +301,7 @@ void startGame()
 		preSeasonPrompt();
 		prompt("",0);
 		gets(_strBuffer);
+		++entrophy;
 	}
 	gameManager();
 }
@@ -326,7 +328,6 @@ void gameManager()
 		{
 			gameBegins--;
 			money			= 12500;
-			week			= 1;
 			year			= 1;
 			league			= 4;
 			numberOfPlayers	= 0;
@@ -334,10 +335,10 @@ void gameManager()
 			teamName[0]		= EOF;
 		}
 		
-		if(week < 7)
+		if(weekNumber < 7)
 		{
-			preSeasonOptions(5);
-			week++;
+			preSeasonOptions(5, weekNumber);
+			weekNumber++;
 		}
 		money -= expenses;
 	}
@@ -351,15 +352,13 @@ void gameManager()
  * @date	26 Aug 2017
  * @version	1.0
  */
-void preSeasonOptions(unsigned char actionNumber)
+void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 {
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char inverse		= 1;
-	unsigned char validAction	= 0;
 	unsigned char y				= 5;
-	
 	cls();
-	printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", week, numberOfPlayers, money);
+	printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", weekNumber, numberOfPlayers, money);
 	
 	if(teamName[0] == EOF)
 	{
@@ -397,6 +396,7 @@ void preSeasonOptions(unsigned char actionNumber)
 		gets(_strBuffer);
 	}
 	y	= _strBuffer[0]-48;
+	entrophy += y;
 	
 	if(y == 1 && teamName[0] == EOF)
 	{
@@ -418,12 +418,18 @@ void preSeasonOptions(unsigned char actionNumber)
 	if(y == 3)
 	{
 		viewSquad();
+		++entrophy;
+	}
+	if(y == 4)
+	{
+		trainingSession();
+		actionNumber = 0;
 	}
 	if(!actionNumber)
 	{
 		return;
 	}
-	preSeasonOptions(actionNumber);
+	preSeasonOptions(actionNumber, weekNumber);
 }
 
 /**
@@ -435,18 +441,22 @@ void preSeasonOptions(unsigned char actionNumber)
  * @version	1.2
  */
 void scoutForPlayers()
-{
+{	
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char x, y;
 	unsigned char playerName[12];
 	cls();
-	playerName[0]	= _A + srand()%25;
+	
+	playerName[0]	= _A + srand(entrophy)%25;
 	playerName[1]	= CLEAR;
 	if(noOfGoalKeepers < 3)
 	{
-		y = srand(frameCounter())%35;
+		y = srand(entrophy)%35;
 		x = 2;
-		while(goalKeepers[y++] != EOF){}
+		while(goalKeepers[y++] != EOF)
+		{
+			++entrophy;
+		}
 		
 		while(goalKeepers[y] != EOF)
 		{
@@ -455,7 +465,7 @@ void scoutForPlayers()
 		playerName[x]		= EOF;
 		setText(signKeeper, 0, 0, 0);
 		setText(playerName, 18, 0, 1);
-		x = 5 + srand(frameCounter())%240;
+		x = 10 + srand(entrophy)%240;
 		while(x%5)
 		{
 			x++;
@@ -480,6 +490,33 @@ void scoutForPlayers()
 			}
 		}
 	}
+}
+
+/**
+ * Runs a training session to improve
+ * player ratings
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	27 Aug 2017
+ * @version	1.1
+ */
+void trainingSession()
+{
+	unsigned char _strBuffer[STRBFSIZE], x;
+	x = numberOfPlayers;
+	cls();
+	for(x; x > 0; x--)
+	{
+		teamRatings[x-1] += srand(++entrophy)%2;
+	}
+	setText(teamRatings,0, 0, 0);
+	gets(_strBuffer);
+//		
+//	}
+//	printf("\ntraining session ended\nview squad to see which players have improved")
+//	prompt("",1);
+//	
 }
 
 /**
@@ -514,6 +551,7 @@ void viewSquad()
 			printf("\n");
 		}
 	}
+	++entrophy;
 	prompt("press new line", ++y);
 	gets(_strBuffer);
 }
@@ -531,6 +569,7 @@ void viewSquad()
 void preSeasonPrompt()
 {
 	printf("it's tough at %s top. %sr taskis to build a new team for %s\nARSENIC CHEMICALS LTD.\n3rd division %s take %sm all\n%s way to %s ARSENIC\nCHECMICALS LTD. PRO LEAGUE.\nas a member of this new division%s must scout for players,\nbuild a fan base, %s prepare\n%sr team for %s season ahead,\nwhich will include playing for\n%s BATHRACHOTOXIN DRINKS CO\nchallenge cup. %s will start\nwith £12,250 %s must prepare\nfor friendlies before %s big\nkick off. buy %s sell players\nwhen transfer windows are\nopen %s make lots of money.\ngood luck. PRESS ENTER\n", the, you, the, and, the, the, the, you, and, you, the, the, you, the, the, you, and, the, and, and);
+	++entrophy;
 }
 
 /**
@@ -549,6 +588,7 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
 	unsigned char c = 0;
 	while(txt[c] != EOF)
 	{
+		++entrophy;
 		if(inv)
 		{
 			text[c] = INVERSE(txt[c]);
@@ -599,6 +639,7 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
 	unsigned char y;
 	if(lineNumber)
 	{
+		++entrophy;
 		for(y = lineNumber; y > 0; y--)
 		{
 			printf("\n");
@@ -650,6 +691,7 @@ void cls()
 	call $0747
 	exx
 	__endasm;
+	++entrophy;
 }
 
 /**
@@ -681,21 +723,5 @@ unsigned char printAt(unsigned short xy) __z88dk_fastcall
 		inc hl
 		jr CHAROUT
 	RETURN:
-	__endasm;
-}
-
-/**
- * Gets the value of the frame counter for some
- * entropy on the srand function
- *
- * @param	na
- * @author	sbebbington
- * @date	27 Aug 2017
- * @version	1.0
- */
-unsigned char frameCounter()
-{
-	__asm
-	ld a,(0x401e)
 	__endasm;
 }
