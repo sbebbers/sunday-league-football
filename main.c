@@ -87,6 +87,7 @@ void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
 unsigned char printAt(unsigned short xy);
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv);
+unsigned char frameCounter();
 
 /**
  * Globals
@@ -211,9 +212,9 @@ unsigned char strikers[79]		=
 /**
  * Team builders
  */
-unsigned char teamKeepers[26]	= 
+unsigned char teamKeepers[32]	= 
 {
-	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
 };
 unsigned char teamDefenders[53] =
 {
@@ -321,8 +322,6 @@ void gameManager()
 	
 	while(money)
 	{
-		cls();
-		printf("game status ");
 		if(gameBegins)
 		{
 			gameBegins--;
@@ -337,7 +336,6 @@ void gameManager()
 		
 		if(week < 7)
 		{
-			printf("pre-season\n");
 			preSeasonOptions(5);
 			week++;
 		}
@@ -358,9 +356,10 @@ void preSeasonOptions(unsigned char actionNumber)
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char inverse		= 1;
 	unsigned char validAction	= 0;
-	unsigned char y				= 4;
+	unsigned char y				= 5;
 	
-	printf("number of players: %d\nmoney £%ld", numberOfPlayers, money);
+	cls();
+	printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", week, numberOfPlayers, money);
 	
 	if(teamName[0] == EOF)
 	{
@@ -370,7 +369,10 @@ void preSeasonOptions(unsigned char actionNumber)
 	{
 		printf("\nteam name: %s", teamName);
 	}
-	setText(optionTwoPreSeasonMsg, 0, ++y, (++inverse)%2);
+	if(numberOfPlayers < 18)
+	{
+		setText(optionTwoPreSeasonMsg, 0, ++y, (++inverse)%2);
+	} 
 	if(numberOfPlayers)
 	{
 		setText(optionThreePreSeasonMsg, 0, ++y, (++inverse)%2);
@@ -395,6 +397,7 @@ void preSeasonOptions(unsigned char actionNumber)
 		gets(_strBuffer);
 	}
 	y	= _strBuffer[0]-48;
+	
 	if(y == 1 && teamName[0] == EOF)
 	{
 		prompt("enter your team name", CLEAR);
@@ -420,7 +423,6 @@ void preSeasonOptions(unsigned char actionNumber)
 	{
 		return;
 	}
-	cls();
 	preSeasonOptions(actionNumber);
 }
 
@@ -442,20 +444,18 @@ void scoutForPlayers()
 	playerName[1]	= CLEAR;
 	if(noOfGoalKeepers < 3)
 	{
-		y = 1 + srand()%35;
+		y = srand(frameCounter())%35;
 		x = 2;
-		while(goalKeepers[y-1] != EOF)
-		{
-			y++;
-		}
+		while(goalKeepers[y++] != EOF){}
+		
 		while(goalKeepers[y] != EOF)
 		{
 			playerName[x++]	= goalKeepers[y++];
 		}
-		playerName[x++]		= EOF;
+		playerName[x]		= EOF;
 		setText(signKeeper, 0, 0, 0);
 		setText(playerName, 18, 0, 1);
-		x = 5 + srand()%240;
+		x = 5 + srand(frameCounter())%240;
 		while(x%5)
 		{
 			x++;
@@ -469,18 +469,15 @@ void scoutForPlayers()
 			numberOfPlayers++;
 			noOfGoalKeepers++;
 			y = 0;
-			x = 0;
-			while(teamKeepers[y] != EOF)
+			for(x = 0; x < noOfGoalKeepers; x++)
 			{
-				y++;
+				while(teamKeepers[y++] != EOF){}
 			}
-			teamKeepers[y] = EOF;
-			y++;
+			x = 0;
 			while(playerName[x] != EOF)
 			{
 				teamKeepers[y++]	= playerName[x++];
 			}
-			teamKeepers[y]	= EOF;
 		}
 	}
 }
@@ -491,8 +488,7 @@ void scoutForPlayers()
  * @param	na
  * @author	sbebbington
  * @date	27 Aug 2017
- * @version	1.0
- * @todo	Issue with outputting the player names
+ * @version	1.1
  */
 void viewSquad()
 {
@@ -500,18 +496,22 @@ void viewSquad()
 	y = 1;
 	cls();
 	if(noOfGoalKeepers){
-		p = 0;
-		printf("goal keepers:\n");
-		for(x = 0; x < noOfGoalKeepers; x++)
+		p = 1;
+		printf("goal keepers:   rating:");
+		for(x = noOfGoalKeepers; x > 0; x--)
 		{
 			z = 0;
 			while(teamKeepers[p] != EOF)
 			{
 				_strBuffer[z++]	= teamKeepers[p++];
 			}
-			z++;
 			_strBuffer[z]	= EOF;
+			p++;
 			setText(_strBuffer, 0, ++y, (++inverse)%2);
+			_strBuffer[0]	= teamRatings[y-2];
+			_strBuffer[1]	= EOF;
+			setText(_strBuffer, 16, y, inverse%2);
+			printf("\n");
 		}
 	}
 	prompt("press new line", ++y);
@@ -681,5 +681,21 @@ unsigned char printAt(unsigned short xy) __z88dk_fastcall
 		inc hl
 		jr CHAROUT
 	RETURN:
+	__endasm;
+}
+
+/**
+ * Gets the value of the frame counter for some
+ * entropy on the srand function
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	27 Aug 2017
+ * @version	1.0
+ */
+unsigned char frameCounter()
+{
+	__asm
+	ld a,(0x401e)
 	__endasm;
 }
