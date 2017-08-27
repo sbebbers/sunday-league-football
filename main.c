@@ -82,6 +82,7 @@ void startGame();
 void gameManager();
 void preSeasonOptions();
 void scoutForPlayers();
+void viewSquad();
 void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
 unsigned char printAt(unsigned short xy);
@@ -138,11 +139,24 @@ unsigned char optionSevenPreSeasonMsg[] =
 	SEVEN, CBRACKET, CLEAR, _C, _H, _O, _O, _S, _E, CLEAR, _H, _O, _M, _E, CLEAR, _G, _R, _O, _U, _N, _D, EOF
 };
 
-unsigned char c;
+/**
+ * Sign players prompt
+ */
+unsigned char signKeeper[] =
+{
+	_S, _I, _G, _N, CLEAR, _G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
+}
+
+/**
+ * String buffers
+ */
 unsigned char text[33];
 unsigned char manager[16];
 unsigned char teamName[16];
 
+/**
+ * Game variables
+ */
 signed long money				= 1;
 unsigned char week;
 unsigned char year;
@@ -163,7 +177,6 @@ unsigned char cupRun			= 0;
 unsigned char kitPurchased		= 0;
 unsigned char minibusPurchased	= 0;
 
-unsigned short numberOfFans		= 0;
 unsigned short income			= 0;
 unsigned short expenses			= 0;
 unsigned short matchAppearanceFee;
@@ -174,6 +187,56 @@ unsigned short matchAppearanceFee;
 unsigned char the[]			= "the";
 unsigned char you[]			= "you";
 unsigned char and[]			= "and";
+
+/**
+ * Players
+ */
+unsigned char goalKeepers[44]	= 
+{
+	EOF, _A, _N, _D, _R, _E, _W, _S, EOF, _J, _O, _N, _E, _S, EOF, _S, _M, _I, _T, _H, EOF, _A, _D, _L, _I, _M, EOF, _B, _A, _C, _O, _N, EOF, _H, _U, _L, _L, EOF, _C, _O, _N, _A, _N, EOF
+};
+unsigned char defenders[81]		=
+{
+	EOF, _D, _A, _V, _I, _S, EOF, _J, _O, _H, _N, _S, _O, _N, EOF, _P, _I, _K, _E, EOF, _S, _M, _Y, _T, _H, EOF, _L, _E, _S, _T, _E, _R, EOF, _W, _E, _S, _T, _L, _Y, EOF, _Z, _E, _D, _D, _Y, EOF, _Y, _O, _U, _N, _G, EOF, _K, _R, _I, _L, _L, EOF, _M, _A, _R, _T, _Y, _N, EOF, _N, _I, _C, _H, _O, _L, _L, _S, EOF, _A, _D, _D, _E, _R, _S, EOF
+}
+unsigned char midfielders[87]	=
+{
+	EOF, _S, _C, _O, _T, _T, EOF, _S, _A, _N, _D, _B, _A, _C, _H, EOF, _R, _I, _C, _H, _A, _R, _D, _S, EOF, _D, _E, _N, _N, _I, _S, EOF, _J, _A, _M, _E, _S, _O, _N, EOF, _B, _O, _B, _S, EOF, _C, _A, _U, _L, _D, _W, _E, _L, _L, EOF, _V, _I, _V, EOF, _R, _U, _T, _T, _E, _R, EOF, _B, _E, _N, _N, _E, _T, _T, EOF, _R, _O, _Y, _L, _E, EOF, _P, _I, _N, _D, _E, _R, EOF
+};
+unsigned char strikers[79]		=
+{
+	EOF, _L, _Y, _O, _N, _S, EOF, _O, _N, _I, _O, _N, _S, EOF, _F, _I, _F, _E, EOF, _R, _A, _N, _D, _S, EOF, _S, _T, _A, _R, _R, EOF, _G, _O, _R, _D, _O, _N, EOF, _C, _L, _I, _V, _E, EOF, _S, _I, _N, _C, _L, _A, _I, _R, EOF, _X, _Y, _L, _O, _N, EOF, _C, _U, _L, _L, _E, _N, EOF, _B, _R, _A, _N, _D, _S, EOF, _H, _A, _N, _T, _S, EOF
+};
+
+/**
+ * Team builders
+ */
+unsigned char teamKeepers[26]	= 
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
+};
+unsigned char teamDefenders[53] =
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF
+};
+unsigned char teamMidFielders[53] = 
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
+	EOF
+};
+unsigned char teamStrikers[26] =
+{
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
+};
+
+unsigned char teamRatings[17] =
+{
+	ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, CLEAR
+};
+
 
 /**
  * Main entry point of game
@@ -210,18 +273,18 @@ int main()
 void startGame()
 {
 	unsigned char _strBuffer[STRBFSIZE];
-	prompt("enter your name\n(max 16 characters)", 8);
+	unsigned char y = 15;
+	prompt("enter your name", 8);
 	gets(_strBuffer);
 	if(!_strBuffer[0])
 	{
 		main();
 	}
 	
-	c = 15;
-	while(c != EOF)
+	while(y != EOF)
 	{
-		manager[c] = _strBuffer[c];
-		c--;
+		manager[y] = _strBuffer[y];
+		y--;
 	}
 	manager[16]		= CLEAR;
 	_strBuffer[0]	= CLEAR;
@@ -268,17 +331,17 @@ void gameManager()
 			year			= 1;
 			league			= 4;
 			numberOfPlayers	= 0;
-			numberOfFans	= 0;
+			expenses		= 0;
 			teamName[0]		= EOF;
 		}
 		
 		if(week < 7)
 		{
 			printf("pre-season\n");
-			preSeasonOptions();
+			preSeasonOptions(5);
 			week++;
 		}
-		money--;
+		money -= expenses;
 	}
 }
 
@@ -290,10 +353,9 @@ void gameManager()
  * @date	26 Aug 2017
  * @version	1.0
  */
-void preSeasonOptions()
+void preSeasonOptions(unsigned char actionNumber)
 {
 	unsigned char _strBuffer[STRBFSIZE];
-	unsigned char actionNumber	= 5;
 	unsigned char inverse		= 1;
 	unsigned char validAction	= 0;
 	unsigned char y				= 4;
@@ -344,18 +406,116 @@ void preSeasonOptions()
 			y--;
 		}
 		teamName[16]	= CLEAR;
-		cls();
-		preSeasonOptions();
 	}
 	if(y == 2)
 	{
 		scoutForPlayers();
+		actionNumber--;
 	}
-	gets(_strBuffer);
+	if(y == 3)
+	{
+		viewSquad();
+	}
+	if(!actionNumber)
+	{
+		return;
+	}
+	cls();
+	preSeasonOptions(actionNumber);
 }
 
+/**
+ * Sets up teams by signing players
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	27 Aug 2017
+ * @version	1.2
+ */
 void scoutForPlayers()
 {
+	unsigned char _strBuffer[STRBFSIZE];
+	unsigned char x, y;
+	unsigned char playerName[12];
+	cls();
+	playerName[0]	= _A + srand()%25;
+	playerName[1]	= CLEAR;
+	if(noOfGoalKeepers < 3)
+	{
+		y = 1 + srand()%35;
+		x = 2;
+		while(goalKeepers[y-1] != EOF)
+		{
+			y++;
+		}
+		while(goalKeepers[y] != EOF)
+		{
+			playerName[x++]	= goalKeepers[y++];
+		}
+		playerName[x++]		= EOF;
+		setText(signKeeper, 0, 0, 0);
+		setText(playerName, 18, 0, 1);
+		x = 5 + srand()%240;
+		while(x%5)
+		{
+			x++;
+		}
+		printf("for £%d Y/N", x);
+		prompt("", 1);
+		gets(_strBuffer);
+		if(_strBuffer[0] == 121)
+		{
+			money -= x;
+			numberOfPlayers++;
+			noOfGoalKeepers++;
+			y = 0;
+			x = 0;
+			while(teamKeepers[y] != EOF)
+			{
+				y++;
+			}
+			teamKeepers[y] = EOF;
+			y++;
+			while(playerName[x] != EOF)
+			{
+				teamKeepers[y++]	= playerName[x++];
+			}
+			teamKeepers[y]	= EOF;
+		}
+	}
+}
+
+/**
+ * Shows the current squad of players
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	27 Aug 2017
+ * @version	1.0
+ * @todo	Issue with outputting the player names
+ */
+void viewSquad()
+{
+	unsigned char _strBuffer[STRBFSIZE], x, y, p, inverse, z;
+	y = 1;
+	cls();
+	if(noOfGoalKeepers){
+		p = 0;
+		printf("goal keepers:\n");
+		for(x = 0; x < noOfGoalKeepers; x++)
+		{
+			z = 0;
+			while(teamKeepers[p] != EOF)
+			{
+				_strBuffer[z++]	= teamKeepers[p++];
+			}
+			z++;
+			_strBuffer[z]	= EOF;
+			setText(_strBuffer, 0, ++y, (++inverse)%2);
+		}
+	}
+	prompt("press new line", ++y);
+	gets(_strBuffer);
 }
 
 /**
@@ -386,7 +546,7 @@ void preSeasonPrompt()
  */
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv)
 {
-	c = 0;
+	unsigned char c = 0;
 	while(txt[c] != EOF)
 	{
 		if(inv)
@@ -414,8 +574,9 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
  */
 void zx80Init()
 {
+	unsigned char y;
 	text[0] = EOF;
-	for(c = 24; c > 0; c--)
+	for(y = 24; y > 0; y--)
 	{
 		printf("                                \n");
 	}
@@ -435,9 +596,10 @@ void zx80Init()
  */
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
 {
+	unsigned char y;
 	if(lineNumber)
 	{
-		for(c = lineNumber; c > 0; c--)
+		for(y = lineNumber; y > 0; y--)
 		{
 			printf("\n");
 		}
