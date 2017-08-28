@@ -70,7 +70,7 @@
 #define NL			0x76
 #define EOF			0xff
 #define DFILE		$400c
-#define STRBFSIZE	0x20
+#define STRBFSIZE	0x1d
 
 /**
  * Function prototypes
@@ -148,6 +148,22 @@ unsigned char optionSevenPreSeasonMsg[] =
 unsigned char signKeeper[] =
 {
 	_S, _I, _G, _N, CLEAR, _G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
+};
+
+/**
+ * Mini bus purchase prompt
+ */
+unsigned char miniBusOne[] =
+{
+	ONE, CBRACKET, CLEAR, _B, _A, _S, _I, _C, CLEAR, ONE, SIX, CLEAR, _S, _E, _A, _T, _E, _R, CLEAR, POUND, TWO, FIVE, ZERO, ZERO, EOF
+};
+unsigned char miniBusTwo[] =
+{
+	TWO, CBRACKET, CLEAR, _M, _I, _D, DASH, _R, _A, _N, _G, _E, CLEAR, ONE, EIGHT, CLEAR, _S, _E, _A, _T, _E, _R, CLEAR, POUND, THREE, THREE, NINE, FIVE, EOF
+};
+unsigned char miniBusThree[] =
+{
+	THREE, CBRACKET, CLEAR, _D, _E, _L, _U, _X, _E, CLEAR, _C, _L, _A, _S, _S, CLEAR, TWO, FOUR, CLEAR,  _S, _E, _A, _T, _E, _R, CLEAR, POUND, FIVE, FOUR, NINE, FIVE, EOF
 };
 
 /**
@@ -276,7 +292,7 @@ int main()
 void startGame()
 {
 	unsigned char _strBuffer[STRBFSIZE];
-	unsigned char y = 15;
+	unsigned char y = EOF;
 	prompt("enter your name", 8);
 	gets(_strBuffer);
 	if(!_strBuffer[0])
@@ -284,18 +300,17 @@ void startGame()
 		main();
 	}
 	
-	while(y != EOF)
+	while(_strBuffer[++y])
 	{
 		manager[y] = _strBuffer[y];
-		y--;
-		++entropy;
 	}
-	manager[16]		= CLEAR;
-	_strBuffer[0]	= CLEAR;
+	entropy			+= srand(manager[0])%8;
+	manager[y]		= 0;
+	_strBuffer[0]	= 0;
 	cls();
 	
 	printf("welcome %s\n", manager);
-	prompt("would you like instructions Y/N?", CLEAR);
+	prompt("would you like instructions Y/N?", 0);
 	gets(_strBuffer);
 	if(_strBuffer[0] == 121)
 	{
@@ -303,7 +318,6 @@ void startGame()
 		preSeasonPrompt();
 		prompt("",0);
 		gets(_strBuffer);
-		++entropy;
 	}
 	gameManager();
 }
@@ -329,12 +343,12 @@ void gameManager()
 		if(gameBegins)
 		{
 			gameBegins--;
-			money			= 12500;
-			year			= 1;
-			league			= 4;
 			numberOfPlayers	= 0;
 			expenses		= 0;
+			year			= 1;
+			league			= 4;
 			teamName[0]		= EOF;
+			money			= 12500;
 		}
 		
 		if(weekNumber < 7)
@@ -359,8 +373,8 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 	while(actionNumber)
 	{
 		unsigned char _strBuffer[STRBFSIZE];
-		unsigned char inverse		= 1;
-		unsigned char y				= 5;
+		unsigned char inverse;
+		unsigned char y	= 5;
 		cls();
 		printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", weekNumber, numberOfPlayers, money);
 		
@@ -394,26 +408,21 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 			setText(optionSevenPreSeasonMsg, 0, ++y, (++inverse)%2);
 		}
 		prompt("choose your option", ++y);
+		gets(_strBuffer);
+		cls();
 		
-		while(_strBuffer[0] < 49 || _strBuffer[0] > 56)
-		{
-			gets(_strBuffer);
-		}
 		y	= _strBuffer[0]-48;
-		
 		if(y == 1 && teamName[0] == EOF)
 		{
-			prompt("enter your team name", CLEAR);
+			prompt("enter your team name", 1);
 			gets(_strBuffer);
-			y = 15;
-			while(y != EOF)
+			y = EOF;
+			while(_strBuffer[++y])
 			{
 				teamName[y] = _strBuffer[y];
-				y--;
 			}
-			teamName[16]	= CLEAR;
+			teamName[y]	= CLEAR;
 		}
-		cls();
 		if(y == 2)
 		{
 			scoutForPlayers();
@@ -428,20 +437,25 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 			trainingSession();
 			actionNumber = 0;
 		}
-		if(y == 5)
+		if(y == 5 && !kitPurchased)
 		{
-			kitPurchased = 1;
-			printf("kit purchased for full squad\nhome and away at £500");
-			money -= 500;
+			kitPurchased++;
+			money		-= 500;
+			expenses	+= y;
+			printf("kit purchased for full squad\nhome and away for £500\nweekly kit maintenance is £5");
 			prompt("",1);
 			gets(_strBuffer);
 		}
-		if(y == 6)
+		if(y == 6 && !minibusPurchased)
 		{
-			minibusPurchased = 1;
 			purchaseMinibus();
+			if(minibusPurchased)
+			{
+				expenses	+= 15;
+			}
+			actionNumber--;
 		}
-		if(y == 7)
+		if(y == 7 && !homeGroundRent)
 		{
 			rentGround();
 		}
@@ -482,10 +496,7 @@ void scoutForPlayers()
 		setText(signKeeper, 0, 0, 0);
 		setText(playerName, 18, 0, 1);
 		x = 10 + srand(entropy)%240;
-		while(x%5)
-		{
-			x++;
-		}
+		while(++x%5){}
 		printf("for £%d Y/N", x);
 		prompt("", 1);
 		gets(_strBuffer);
@@ -533,16 +544,68 @@ void trainingSession()
 	gets(_strBuffer);
 }
 
+/**
+ * Buy your minibus here
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	28 Aug 2017
+ * @version	1.0
+ */
 void purchaseMinibus()
 {
-	money -= 2500;
-	expenses += 20;
+	unsigned char _strBuffer[STRBFSIZE];
+	unsigned char inverse, y;
+	
+	setText(miniBusOne, 0, ++y, (++inverse)%2);
+	setText(miniBusTwo, 0, ++y, (++inverse)%2);
+	setText(miniBusThree, 0, ++y, (++inverse)%2);
+	prompt("select your team bus",++y);
+	gets(_strBuffer);
+	y	= _strBuffer[0]-48;
+	
+	if(y < 1 || y > 3)
+	{
+		return;
+	}
+	if(y == 1)
+	{
+		money -= 2500;
+	}
+	else if(y == 2)
+	{
+		money -= 3595;
+	}
+	else
+	{
+		money -= 5495;
+	}
+	minibusPurchased++;
 }
 
+/**
+ * Adds in a ground rent logic
+ *
+ * @param	na
+ * @author	sbebbington
+ * @date	28 Aug 2017
+ * @version	1.0
+ */
 void rentGround()
 {
-	money -= 100;
-	expenses += srand(entropy)%50;
+	unsigned char _strBuffer[STRBFSIZE];
+	unsigned char y;
+	y	= INVERSE(srand(++entropy)%248);
+	while(++y%10){}
+	printf("a local rugby league club has\noffer a ground share for £%d\nwith weekly expenses of £25",y);
+	prompt("Y/N?",1);
+	gets(_strBuffer);
+	if(_strBuffer[0] == 121)
+	{
+		money		-= y;
+		expenses	+= 25;
+		homeGroundRent++;
+	}
 }
 
 /**
