@@ -144,21 +144,25 @@ unsigned char optionSevenPreSeasonMsg[] =
 /**
  * Sign players prompt
  */
+unsigned char sign[] = 
+{
+	_S, _I, _G, _N, EOF
+};
 unsigned char signKeeper[] =
 {
-	_S, _I, _G, _N, CLEAR,	_G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
+	_G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
 };
 unsigned char signDefender[] =
 {
-	_D, _E, _F, _E, _N, _D, _E, _R, CLEAR, CLEAR, CLEAR, EOF
+	_D, _E, _F, _E, _N, _D, _E, _R, EOF
 };
 unsigned char signMidFielder[] =
 {
-	_M, _I, _D, _F, _I, _E, _L, _D, _E, _R, CLEAR, EOF
+	_M, _I, _D, _F, _I, _E, _L, _D, _E, _R, EOF
 };
 unsigned char signStriker[] =
 {
-	_S, _T, _R, _I, _K, _E, _R, CLEAR, CLEAR, CLEAR, CLEAR, EOF
+	_S, _T, _R, _I, _K, _E, _R, EOF
 };
 
 /**
@@ -440,7 +444,7 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 			money		-= 500;
 			expenses	+= y;
 			printf("kit purchased for full squad\nhome and away for £500\nweekly kit maintenance is £5");
-			prompt("",1);
+			prompt("", 1);
 			gets(_strBuffer);
 			actionNumber--;
 		}
@@ -459,23 +463,24 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 }
 
 /**
- * Sets up teams by signing players
+ * Scout for and sign players
  *
  * @param	na
  * @author	sbebbington
- * @date	27 Aug 2017
- * @version	1.2
+ * @date	02 Sep 2017
+ * @version	1.3
  */
 void scoutForPlayers()
-{	
+{
 	unsigned char _strBuffer[STRBFSIZE];
-	unsigned char x, y;
+	unsigned char x, y, pass = 4;
 	unsigned char playerName[12];
 	
-	playerName[0]	= _A + srand(++entropy)%25;
-	playerName[1]	= CLEAR;
-	if(noOfGoalKeepers < 3)
+	while(pass)
 	{
+		playerName[0]	= _A + srand(++entropy)%25;
+		playerName[1]	= CLEAR;
+		
 		y = srand(entropy)%239;
 		x = 2;
 		while(playerNames[y++] != EOF){}
@@ -485,10 +490,29 @@ void scoutForPlayers()
 			playerName[x++]	= playerNames[y++];
 		}
 		playerName[x]		= EOF;
-		setText(signKeeper, 0, 0, 0);
+		cls();
+		
+		setText(sign, 0, 0, 0);
 		setText(playerName, 18, 0, 1);
 		x = 10 + srand(entropy)%240;
 		while(++x%5){}
+		
+		if(pass == 4 && noOfGoalKeepers < 3)
+		{
+			setText(signKeeper, 5, 0, 0);
+		}
+		if(pass == 3 && noOfDefenders < 5)
+		{
+			setText(signDefender, 5, 0, 0);
+		}
+		if(pass == 2 && noOfMidFielders < 5)
+		{
+			setText(signMidFielder, 5, 0, 0);
+		}
+		if(pass == 1 && noOfStrikers < 3)
+		{
+			setText(signStriker, 5, 0, 0);
+		}
 		printf("for £%d Y/N", x);
 		prompt("", 1);
 		gets(_strBuffer);
@@ -496,43 +520,91 @@ void scoutForPlayers()
 		{
 			money -= x;
 			numberOfPlayers++;
-			noOfGoalKeepers++;
 			y = 0;
-			for(x = 0; x < noOfGoalKeepers; x++)
+			if(pass == 4)
 			{
-				while(teamKeepers[y++] != EOF){}
+				noOfGoalKeepers++;
+				for(x = 0; x < noOfGoalKeepers; x++)
+				{
+					while(teamKeepers[y++] != EOF){}
+				}
+				x = 0;
+				while(playerName[x] != EOF)
+				{
+					teamKeepers[y++]	= playerName[x++];
+				}
 			}
-			x = 0;
-			while(playerName[x] != EOF)
+			if(pass == 3)
 			{
-				teamKeepers[y++]	= playerName[x++];
+				noOfDefenders++;
+				for(x = 0; x < noOfDefenders; x++)
+				{
+					while(teamDefenders[y++] != EOF){}
+				}
+				x = 0;
+				while(playerName[x] != EOF)
+				{
+					teamDefenders[y++]	= playerName[x++];
+				}
+			}
+			if(pass == 2)
+			{
+				noOfMidFielders++;
+				for(x = 0; x < noOfMidFielders; x++)
+				{
+					while(teamDefenders[y++] != EOF){}
+				}
+				x = 0;
+				while(playerName[x] != EOF)
+				{
+					teamMidFielders[y++]	= playerName[x++];
+				}
+			}
+			if(pass == 1)
+			{
+				noOfStrikers++;
+				for(x = 0; x < noOfStrikers; x++)
+				{
+					while(teamStrikers[y++] != EOF){}
+				}
+				x = 0;
+				while(playerName[x] != EOF)
+				{
+					teamStrikers[y++]	= playerName[x++];
+				}
 			}
 		}
+		pass--;
 	}
 }
 
 /**
  * Runs a training session to improve
- * player ratings
+ * player ratings - training cost is
+ * now determined by the number of
+ * players in squad and improvements
+ * only happen when you have > 5
+ * players
  *
  * @param	na
  * @author	sbebbington
- * @date	27 Aug 2017
- * @version	1.1
+ * @date	02 Sep 2017
+ * @version	1.2
  */
 void trainingSession()
 {
-	unsigned char _strBuffer[STRBFSIZE], x;
-	x = numberOfPlayers;
- 	for(x; x > 0; x--)
+	unsigned char _strBuffer[STRBFSIZE], x = numberOfPlayers;
+	if(numberOfPlayers > 5)
 	{
-		if(teamRatings[x-1] < SEVEN && x)
+		for(x; x > 0; x--)
 		{
-			teamRatings[x-1] += srand(++entropy)%2;
+			if(teamRatings[x-1] < SEVEN && x)
+			{
+				teamRatings[x-1] += srand(++entropy)%2;
+			}
 		}
 	}
-	x = srand(entropy) % 128;
-	while(++x%5){}
+	x = 10 + numberOfPlayers * 5;
 	printf("the training session cost £%d\n\nview squad to see which players have improved",x);
 	money -= x;
 	prompt("",1);
