@@ -86,7 +86,6 @@ void trainingSession();
 void purchaseMinibus();
 void rentGround();
 void viewSquad();
-void preSeasonPrompt();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
 unsigned char printAt(unsigned short xy);
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv);
@@ -147,8 +146,20 @@ unsigned char optionSevenPreSeasonMsg[] =
  */
 unsigned char signKeeper[] =
 {
-	_S, _I, _G, _N, CLEAR, _G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
+	_S, _I, _G, _N, CLEAR,	_G, _O, _A, _L, CLEAR, _K, _E, _E, _P, _E, _R, EOF
 };
+unsigned char signDefender[] =
+{
+	_D, _E, _F, _E, _N, _D, _E, _R, CLEAR, CLEAR, CLEAR, EOF
+};
+unsigned char signMidFielder[] =
+{
+	_M, _I, _D, _F, _I, _E, _L, _D, _E, _R, CLEAR, EOF
+};
+unsigned char signStriker[] =
+{
+	_S, _T, _R, _I, _K, _E, _R, CLEAR, CLEAR, CLEAR, CLEAR, EOF
+}
 
 /**
  * Mini bus purchase prompt
@@ -210,21 +221,15 @@ unsigned char and[]			= "and";
 /**
  * Players
  */
-unsigned char goalKeepers[44]	= 
+unsigned char playerNames[]	= 
 {
-	EOF, _A, _N, _D, _R, _E, _W, _S, EOF, _J, _O, _N, _E, _S, EOF, _S, _M, _I, _T, _H, EOF, _A, _D, _L, _I, _M, EOF, _B, _A, _C, _O, _N, EOF, _H, _U, _L, _L, EOF, _C, _O, _N, _A, _N, EOF
+	EOF, _A, _N, _D, _R, _E, _W, _S, EOF, _J, _O, _H, _N, _S, EOF, _S, _M, _I, _T, _H, EOF, _A, _D, _L, _I, _M, EOF, _B, _A, _C, _O, _N, EOF, _H, _U, _L, _L, EOF, _C, _O, _N, _A, _N, EOF, _D, _A, _V, _I, _S, EOF, _J, _O, _H, _N, _S, _O, _N, EOF, _P, _I, _K, _E, EOF, _S, _M, _Y, _T, _H, EOF, _L, _E, _S, _T, _E, _R, EOF, _W, _E, _S, _T, _L, _Y, EOF, _Z, _E, _D, _D, _Y, EOF, _Y, _O, _U, _N, _G, EOF, _K, _R, _I, _L, _L, EOF,
+	_M, _A, _R, _T, _Y, _N, EOF, _N, _I, _C, _H, _O, _L, _L, _S, EOF, _A, _D, _D, _E, _R, _S, EOF, _S, _C, _O, _T, _T, EOF, _S, _A, _N, _D, _B, _A, _C, _H, EOF, _R, _I, _C, _H, _A, _R, _D, _S, EOF, _D, _E, _N, _N, _I, _S, EOF, _J, _A, _M, _E, _S, _O, _N, EOF, _B, _O, _B, _S, EOF, _C, _A, _U, _L, _D, _W, _E, _L, _L, EOF, _V, _I, _V, EOF, _R, _U, _T, _T, _E, _R, EOF, _B, _E, _N, _N, _E, _T, _T, EOF, _R, _O, _Y, _L, _E,
+	EOF, _P, _I, _N, _D, _E, _R, EOF, _L, _Y, _O, _N, _S, EOF, _O, _N, _I, _O, _N, _S, EOF, _F, _I, _F, _E, EOF, _R, _A, _N, _D, _S, EOF, _S, _T, _A, _R, _R, EOF, _G, _O, _R, _D, _O, _N, EOF, _C, _L, _I, _V, _E, EOF
 };
-unsigned char defenders[81]		=
+unsigned char transferNames[] =
 {
-	EOF, _D, _A, _V, _I, _S, EOF, _J, _O, _H, _N, _S, _O, _N, EOF, _P, _I, _K, _E, EOF, _S, _M, _Y, _T, _H, EOF, _L, _E, _S, _T, _E, _R, EOF, _W, _E, _S, _T, _L, _Y, EOF, _Z, _E, _D, _D, _Y, EOF, _Y, _O, _U, _N, _G, EOF, _K, _R, _I, _L, _L, EOF, _M, _A, _R, _T, _Y, _N, EOF, _N, _I, _C, _H, _O, _L, _L, _S, EOF, _A, _D, _D, _E, _R, _S, EOF
-};
-unsigned char midfielders[87]	=
-{
-	EOF, _S, _C, _O, _T, _T, EOF, _S, _A, _N, _D, _B, _A, _C, _H, EOF, _R, _I, _C, _H, _A, _R, _D, _S, EOF, _D, _E, _N, _N, _I, _S, EOF, _J, _A, _M, _E, _S, _O, _N, EOF, _B, _O, _B, _S, EOF, _C, _A, _U, _L, _D, _W, _E, _L, _L, EOF, _V, _I, _V, EOF, _R, _U, _T, _T, _E, _R, EOF, _B, _E, _N, _N, _E, _T, _T, EOF, _R, _O, _Y, _L, _E, EOF, _P, _I, _N, _D, _E, _R, EOF
-};
-unsigned char strikers[79]		=
-{
-	EOF, _L, _Y, _O, _N, _S, EOF, _O, _N, _I, _O, _N, _S, EOF, _F, _I, _F, _E, EOF, _R, _A, _N, _D, _S, EOF, _S, _T, _A, _R, _R, EOF, _G, _O, _R, _D, _O, _N, EOF, _C, _L, _I, _V, _E, EOF, _S, _I, _N, _C, _L, _A, _I, _R, EOF, _X, _Y, _L, _O, _N, EOF, _C, _U, _L, _L, _E, _N, EOF, _B, _R, _A, _N, _D, _S, EOF, _H, _A, _N, _T, _S, EOF
+	EOF, _S, _I, _N, _C, _L, _A, _I, _R, EOF, _X, _Y, _L, _O, _N, EOF, _C, _U, _L, _L, _E, _N, EOF, _B, _R, _A, _N, _D, _S, EOF, _H, _A, _N, _T, _S,
 };
 
 /**
@@ -306,19 +311,10 @@ void startGame()
 	}
 	entropy			+= srand(manager[0])%8;
 	manager[y]		= 0;
-	_strBuffer[0]	= 0;
 	cls();
 	
-	printf("welcome %s\n", manager);
-	prompt("would you like instructions Y/N?", 0);
+	printf("lets get started %s\n", manager);
 	gets(_strBuffer);
-	if(_strBuffer[0] == 121)
-	{
-		cls();
-		preSeasonPrompt();
-		prompt("",0);
-		gets(_strBuffer);
-	}
 	gameManager();
 }
 
@@ -445,19 +441,17 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 			printf("kit purchased for full squad\nhome and away for £500\nweekly kit maintenance is £5");
 			prompt("",1);
 			gets(_strBuffer);
+			actionNumber--;
 		}
 		if(y == 6 && !minibusPurchased)
 		{
 			purchaseMinibus();
-			if(minibusPurchased)
-			{
-				expenses	+= 15;
-			}
 			actionNumber--;
 		}
 		if(y == 7 && !homeGroundRent)
 		{
 			rentGround();
+			actionNumber--;
 		}
 		entropy += y;
 	}
@@ -477,20 +471,52 @@ void scoutForPlayers()
 	unsigned char x, y;
 	unsigned char playerName[12];
 	
-	playerName[0]	= _A + srand(entropy)%25;
+	playerName[0]	= _A + srand(++entropy)%25;
 	playerName[1]	= CLEAR;
 	if(noOfGoalKeepers < 3)
 	{
-		y = srand(entropy)%35;
+		y = srand(entropy)%239;
 		x = 2;
-		while(goalKeepers[y++] != EOF)
-		{
-			++entropy;
-		}
+		while(playerNames[y++] != EOF){}
 		
-		while(goalKeepers[y] != EOF)
+		while(playerNames[y] != EOF)
 		{
-			playerName[x++]	= goalKeepers[y++];
+			playerName[x++]	= playerNames[y++];
+		}
+		playerName[x]		= EOF;
+		setText(signKeeper, 0, 0, 0);
+		setText(playerName, 18, 0, 1);
+		x = 10 + srand(entropy)%240;
+		while(++x%5){}
+		printf("for £%d Y/N", x);
+		prompt("", 1);
+		gets(_strBuffer);
+		if(_strBuffer[0] == 121)
+		{
+			money -= x;
+			numberOfPlayers++;
+			noOfGoalKeepers++;
+			y = 0;
+			for(x = 0; x < noOfGoalKeepers; x++)
+			{
+				while(teamKeepers[y++] != EOF){}
+			}
+			x = 0;
+			while(playerName[x] != EOF)
+			{
+				teamKeepers[y++]	= playerName[x++];
+			}
+		}
+	}
+	if(noOfDefenders < 5)
+	{
+		y = srand(++entropy)%239;
+		x = 2;
+		while(defenders[y++] != EOF){}
+		
+		while(playerNames[y] != EOF)
+		{
+			playerName[x++]	= defenders[y++];
 		}
 		playerName[x]		= EOF;
 		setText(signKeeper, 0, 0, 0);
@@ -534,7 +560,10 @@ void trainingSession()
 	x = numberOfPlayers;
  	for(x; x > 0; x--)
 	{
-		teamRatings[x-1] += srand(++entropy)%2;
+		if(teamRatings[x-1] < SEVEN && x)
+		{
+			teamRatings[x-1] += srand(++entropy)%2;
+		}
 	}
 	x = srand(entropy) % 128;
 	while(++x%5){}
@@ -581,6 +610,7 @@ void purchaseMinibus()
 		money -= 5495;
 	}
 	minibusPurchased++;
+	expenses	+= 15;
 }
 
 /**
@@ -642,22 +672,6 @@ void viewSquad()
 	++entropy;
 	prompt("press new line", ++y);
 	gets(_strBuffer);
-}
-
-/**
- * Basic instructions, probably typos therein
- * Now uses a dictionary look-up table to save
- * some bytes
- *
- * @param	na
- * @author	sbebbington
- * @date	23 Aug 2017
- * @version	1.1
- */
-void preSeasonPrompt()
-{
-	printf("it's tough at %s top. %sr taskis to build a new team for %s\nARSENIC CHEMICALS LTD.\n3rd division %s take %sm all\n%s way to %s ARSENIC\nCHECMICALS LTD. PRO LEAGUE.\nas a member of this new division%s must scout for players,\nbuild a fan base, %s prepare\n%sr team for %s season ahead,\nwhich will include playing for\n%s BATHRACHOTOXIN DRINKS CO\nchallenge cup. %s will start\nwith £12,250 %s must prepare\nfor friendlies before %s big\nkick off. buy %s sell players\nwhen transfer windows are\nopen %s make lots of money.\ngood luck. PRESS ENTER\n", the, you, the, and, the, the, the, you, and, you, the, the, you, the, the, you, and, the, and, and);
-	++entropy;
 }
 
 /**
@@ -747,8 +761,6 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
  * @author	sbebbington
  * @date	22 Aug 2017
  * @version	1.1a
- * @todo	Should be able to increase just the L
- * 			register of the DFILE
  */
 void cls()
 {
