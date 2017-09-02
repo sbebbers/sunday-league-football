@@ -159,7 +159,7 @@ unsigned char signMidFielder[] =
 unsigned char signStriker[] =
 {
 	_S, _T, _R, _I, _K, _E, _R, CLEAR, CLEAR, CLEAR, CLEAR, EOF
-}
+};
 
 /**
  * Mini bus purchase prompt
@@ -314,6 +314,7 @@ void startGame()
 	cls();
 	
 	printf("lets get started %s\n", manager);
+	prompt("",0);
 	gets(_strBuffer);
 	gameManager();
 }
@@ -482,41 +483,6 @@ void scoutForPlayers()
 		while(playerNames[y] != EOF)
 		{
 			playerName[x++]	= playerNames[y++];
-		}
-		playerName[x]		= EOF;
-		setText(signKeeper, 0, 0, 0);
-		setText(playerName, 18, 0, 1);
-		x = 10 + srand(entropy)%240;
-		while(++x%5){}
-		printf("for £%d Y/N", x);
-		prompt("", 1);
-		gets(_strBuffer);
-		if(_strBuffer[0] == 121)
-		{
-			money -= x;
-			numberOfPlayers++;
-			noOfGoalKeepers++;
-			y = 0;
-			for(x = 0; x < noOfGoalKeepers; x++)
-			{
-				while(teamKeepers[y++] != EOF){}
-			}
-			x = 0;
-			while(playerName[x] != EOF)
-			{
-				teamKeepers[y++]	= playerName[x++];
-			}
-		}
-	}
-	if(noOfDefenders < 5)
-	{
-		y = srand(++entropy)%239;
-		x = 2;
-		while(defenders[y++] != EOF){}
-		
-		while(playerNames[y] != EOF)
-		{
-			playerName[x++]	= defenders[y++];
 		}
 		playerName[x]		= EOF;
 		setText(signKeeper, 0, 0, 0);
