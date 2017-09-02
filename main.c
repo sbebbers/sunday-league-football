@@ -496,85 +496,103 @@ void scoutForPlayers()
 		setText(playerName, 18, 0, 1);
 		x = 10 + srand(entropy)%240;
 		while(++x%5){}
-		
+		if(noOfGoalKeepers == 3)
+		{
+			pass--;
+		}
 		if(pass == 4 && noOfGoalKeepers < 3)
 		{
 			setText(signKeeper, 5, 0, 0);
+		}
+		if(noOfDefenders == 5)
+		{
+			pass--;
 		}
 		if(pass == 3 && noOfDefenders < 5)
 		{
 			setText(signDefender, 5, 0, 0);
 		}
+		if(noOfMidFielders == 5)
+		{
+			pass--;
+		}
 		if(pass == 2 && noOfMidFielders < 5)
 		{
 			setText(signMidFielder, 5, 0, 0);
+		}
+		if(noOfStrikers == 3)
+		{
+			pass--;
 		}
 		if(pass == 1 && noOfStrikers < 3)
 		{
 			setText(signStriker, 5, 0, 0);
 		}
-		printf("for £%d Y/N", x);
-		prompt("", 1);
-		gets(_strBuffer);
-		if(_strBuffer[0] == 121)
+		if(pass)
 		{
-			money -= x;
-			numberOfPlayers++;
-			y = 0;
-			if(pass == 4)
+			printf("for £%d Y/N", x);
+			prompt("", 1);
+			gets(_strBuffer);
+			if(_strBuffer[0] == 121)
 			{
-				noOfGoalKeepers++;
-				for(x = 0; x < noOfGoalKeepers; x++)
+				money -= x;
+				numberOfPlayers++;
+				y = 0;
+				if(pass == 4)
 				{
-					while(teamKeepers[y++] != EOF){}
+					noOfGoalKeepers++;
+					for(x = 0; x < noOfGoalKeepers; x++)
+					{
+						while(teamKeepers[y++] != EOF){}
+					}
+					x = 0;
+					while(playerName[x] != EOF)
+					{
+						teamKeepers[y++]	= playerName[x++];
+					}
 				}
-				x = 0;
-				while(playerName[x] != EOF)
+				if(pass == 3)
 				{
-					teamKeepers[y++]	= playerName[x++];
+					noOfDefenders++;
+					for(x = 0; x < noOfDefenders; x++)
+					{
+						while(teamDefenders[y++] != EOF){}
+					}
+					x = 0;
+					while(playerName[x] != EOF)
+					{
+						teamDefenders[y++]	= playerName[x++];
+					}
+				}
+				if(pass == 2)
+				{
+					noOfMidFielders++;
+					for(x = 0; x < noOfMidFielders; x++)
+					{
+						while(teamDefenders[y++] != EOF){}
+					}
+					x = 0;
+					while(playerName[x] != EOF)
+					{
+						teamMidFielders[y++]	= playerName[x++];
+					}
+				}
+				if(pass == 1)
+				{
+					noOfStrikers++;
+					for(x = 0; x < noOfStrikers; x++)
+					{
+						while(teamStrikers[y++] != EOF){}
+					}
+					x = 0;
+					while(playerName[x] != EOF)
+					{
+						teamStrikers[y++]	= playerName[x++];
+					}
 				}
 			}
-			if(pass == 3)
-			{
-				noOfDefenders++;
-				for(x = 0; x < noOfDefenders; x++)
-				{
-					while(teamDefenders[y++] != EOF){}
-				}
-				x = 0;
-				while(playerName[x] != EOF)
-				{
-					teamDefenders[y++]	= playerName[x++];
-				}
-			}
-			if(pass == 2)
-			{
-				noOfMidFielders++;
-				for(x = 0; x < noOfMidFielders; x++)
-				{
-					while(teamDefenders[y++] != EOF){}
-				}
-				x = 0;
-				while(playerName[x] != EOF)
-				{
-					teamMidFielders[y++]	= playerName[x++];
-				}
-			}
-			if(pass == 1)
-			{
-				noOfStrikers++;
-				for(x = 0; x < noOfStrikers; x++)
-				{
-					while(teamStrikers[y++] != EOF){}
-				}
-				x = 0;
-				while(playerName[x] != EOF)
-				{
-					teamStrikers[y++]	= playerName[x++];
-				}
-			}
+			pass--;
 		}
-		pass--;
 	}
 }
 
@@ -681,8 +699,8 @@ void rentGround()
  *
  * @param	na
  * @author	sbebbington
- * @date	27 Aug 2017
- * @version	1.1
+ * @date	02 Sep 2017
+ * @version	1.2
  */
 void viewSquad()
 {
@@ -690,7 +708,7 @@ void viewSquad()
 	y = 1;
 	if(noOfGoalKeepers){
 		p = 1;
-		printf("goal keepers:   rating:");
+		printf("goal keepers:   RATING");
 		for(x = noOfGoalKeepers; x > 0; x--)
 		{
 			z = 0;
@@ -707,7 +725,65 @@ void viewSquad()
 			printf("\n");
 		}
 	}
-	++entropy;
+	if(noOfDefenders){
+		p = 1;
+		printf("defenders:");
+		for(x = noOfDefenders; x > 0; x--)
+		{
+			z = 0;
+			while(teamDefenders[p] != EOF)
+			{
+				_strBuffer[z++]	= teamDefenders[p++];
+			}
+			_strBuffer[z]	= EOF;
+			p++;
+			setText(_strBuffer, 0, ++y, (++inverse)%2);
+			_strBuffer[0]	= teamRatings[y-3];
+			_strBuffer[1]	= EOF;
+			setText(_strBuffer, 16, y, inverse%2);
+			printf("\n");
+		}
+	}
+	if(noOfMidFielders)
+	{
+		p = 1;
+		printf("midfielders:");
+		for(x = noOfMidFielders; x > 0; x--)
+		{
+			z = 0;
+			while(teamMidFielders[p] != EOF)
+			{
+				_strBuffer[z++]	= teamMidFielders[p++];
+			}
+			_strBuffer[z]	= EOF;
+			p++;
+			setText(_strBuffer, 0, ++y, (++inverse)%2);
+			_strBuffer[0]	= teamRatings[y-4];
+			_strBuffer[1]	= EOF;
+			setText(_strBuffer, 16, y, inverse%2);
+			printf("\n");
+		}
+	}
+	if(noOfStrikers)
+	{
+		p = 1;
+		printf("strikers:");
+		for(x = noOfStrikers; x > 0; x--)
+		{
+			z = 0;
+			while(teamStrikers[p] != EOF)
+			{
+				_strBuffer[z++]	= teamStrikers[p++];
+			}
+			_strBuffer[z]	= EOF;
+			p++;
+			setText(_strBuffer, 0, ++y, (++inverse)%2);
+			_strBuffer[0]	= teamRatings[y-4];
+			_strBuffer[1]	= EOF;
+			setText(_strBuffer, 16, y, inverse%2);
+			printf("\n");
+		}
+	}
 	prompt("press new line", ++y);
 	gets(_strBuffer);
 }
