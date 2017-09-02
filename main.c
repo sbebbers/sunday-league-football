@@ -239,30 +239,30 @@ unsigned char transferNames[] =
 /**
  * Team builders
  */
-unsigned char teamKeepers[32]	= 
+unsigned char teamKeepers[]	= 
 {
 	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
 };
-unsigned char teamDefenders[53] =
+unsigned char teamDefenders[] =
 {
 	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
 	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
 	EOF
 };
-unsigned char teamMidFielders[53] = 
+unsigned char teamMidFielders[] = 
 {
 	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
 	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF,
 	EOF
 };
-unsigned char teamStrikers[26] =
+unsigned char teamStrikers[] =
 {
-	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
+	EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF, EOF
 };
 
-unsigned char teamRatings[17] =
+unsigned char teamRatings[16] =
 {
-	ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, EOF
+	ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, EOF
 };
 
 
@@ -295,8 +295,8 @@ int main()
  *
  * @param	na
  * @author	sbebbington
- * @date	23 Aug 2017
- * @version	1.1
+ * @date	02 Sep 2017
+ * @version	1.2
  */
 void startGame()
 {
@@ -317,9 +317,6 @@ void startGame()
 	manager[y]		= 0;
 	cls();
 	
-	printf("lets get started %s\n", manager);
-	prompt("",0);
-	gets(_strBuffer);
 	gameManager();
 }
 
@@ -475,7 +472,10 @@ void scoutForPlayers()
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char x, y, pass = 4;
 	unsigned char playerName[12];
-	
+	if(numberOfPlayers >= 16)
+	{
+		return;
+	}
 	while(pass)
 	{
 		playerName[0]	= _A + srand(++entropy)%25;
@@ -708,7 +708,7 @@ void viewSquad()
 	y = 1;
 	if(noOfGoalKeepers){
 		p = 1;
-		printf("goal keepers:   RATING");
+		printf("player:         RATING");
 		for(x = noOfGoalKeepers; x > 0; x--)
 		{
 			z = 0;
@@ -722,12 +722,11 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[y-2];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
-			printf("\n");
 		}
+		y++;
 	}
 	if(noOfDefenders){
 		p = 1;
-		printf("defenders:");
 		for(x = noOfDefenders; x > 0; x--)
 		{
 			z = 0;
@@ -741,13 +740,12 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[y-3];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
-			printf("\n");
 		}
+		y++;
 	}
 	if(noOfMidFielders)
 	{
 		p = 1;
-		printf("midfielders:");
 		for(x = noOfMidFielders; x > 0; x--)
 		{
 			z = 0;
@@ -761,13 +759,12 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[y-4];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
-			printf("\n");
 		}
+		y++;
 	}
 	if(noOfStrikers)
 	{
 		p = 1;
-		printf("strikers:");
 		for(x = noOfStrikers; x > 0; x--)
 		{
 			z = 0;
@@ -781,10 +778,9 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[y-4];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
-			printf("\n");
 		}
 	}
-	prompt("press new line", ++y);
+	prompt("", y);
 	gets(_strBuffer);
 }
 
