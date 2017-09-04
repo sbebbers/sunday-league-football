@@ -194,7 +194,7 @@ unsigned char teamName[16];
 signed long money				= 1;
 unsigned char year;
 unsigned char league;
-unsigned short entropy			= 1;
+unsigned short entropy;
 
 unsigned char numberOfPlayers	= 0;
 unsigned char noOfGoalKeepers	= 0;
@@ -816,6 +816,7 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
  */
 void zx80Init()
 {
+	entropy++;
 	unsigned char y;
 	text[0] = EOF;
 	for(y = 24; y > 0; y--)
