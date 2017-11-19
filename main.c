@@ -746,8 +746,8 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
  */
 void zx80Init()
 {
-	entropy++;
 	unsigned char y;
+	entropy++;
 	text[0] = EOF;
 	for(y = 24; y > 0; y--)
 	{
