@@ -183,9 +183,28 @@ unsigned char teamStrikers[] =
 
 unsigned char teamRatings[] =
 {
-	ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, EOF
+	ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, EOF
 };
 
+unsigned char goalKeeper[] =
+{
+	_G, _K, EOF
+};
+
+unsigned char defender[] =
+{
+	_D, _F, EOF
+};
+
+unsigned char midfielder[] =
+{
+	_M, _D, EOF
+};
+
+unsigned char striker[] =
+{
+	_S, _K, EOF
+};
 
 /**
  * Main entry point of game
@@ -457,6 +476,13 @@ void scoutForPlayers()
 			if(_strBuffer[0] == 121)
 			{
 				money -= x;
+				if(x > 100){
+					teamRatings[numberOfPlayers] = ONE + srand(x) % 3;
+					if(x > 185)
+					{
+						teamRatings[numberOfPlayers]++;
+					}
+				}
 				numberOfPlayers++;
 				y = 0;
 				if(pass == 4)
@@ -628,7 +654,7 @@ void viewSquad()
 	y = 1;
 	if(noOfGoalKeepers){
 		p = 1;
-		printf("player:         RATING");
+		printf("player       RATING  position");
 		for(x = noOfGoalKeepers; x > 0; x--)
 		{
 			z = 0;
@@ -642,6 +668,7 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[inverse];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
+			setText(goalKeeper, 24, y, inverse%2);
 		}
 		y++;
 	}
@@ -660,6 +687,7 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[inverse];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
+			setText(defender, 24, y, inverse%2);
 		}
 		y++;
 	}
@@ -679,6 +707,7 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[inverse];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
+			setText(midfielder, 24, y, inverse%2);
 		}
 		y++;
 	}
@@ -698,6 +727,7 @@ void viewSquad()
 			_strBuffer[0]	= teamRatings[inverse];
 			_strBuffer[1]	= EOF;
 			setText(_strBuffer, 16, y, inverse%2);
+			setText(striker, 24, y, inverse%2);
 		}
 	}
 	prompt("", y);
