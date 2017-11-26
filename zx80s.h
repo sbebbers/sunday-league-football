@@ -75,3 +75,5 @@
 #define INVERSE(A)	(0x80 | A)
 #define NL			0x76
 #define EOF			0xff
+#define DFILE		$400c
+#define STRBFSIZE	0x18
