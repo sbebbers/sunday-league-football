@@ -17,6 +17,8 @@ void purchaseMinibus();
 void rentGround();
 void viewSquad();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
+void printSpc(unsigned char spc, unsigned char txt[31]);
+void printTab(unsigned char tab, unsigned char txt[28]);
 unsigned char printAt(unsigned short xy);
 unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, unsigned char inv);
 
@@ -786,6 +788,36 @@ void zx80Init()
 	cls();
 }
 
+/**
+ * Simulates the PRINT SPC() BASIC function
+ *
+ * @param	unsigned char, unsigned char
+ * @author	sbebbington
+ * @date	27 Nov 2017
+ * @version	1.0
+ */
+void printSpc(unsigned char spc, unsigned char txt[31])
+{
+	for(spc; spc > 0; spc--)
+	{
+		printf(" ");
+	}
+	printf("%s", txt);
+}
+
+/**
+ * Simulates tabulation, like printf("\tHello");
+ *
+ * @param	unsigned char, unsigned char
+ * @author	sbebbington
+ * @date	27 Nov 2017
+ * @version	1.0
+ */
+void printTab(unsigned char tab, unsigned char txt[28])
+{
+	tab = tab * 4;
+	printSpc(tab, txt);
+}
 
 /**
  * Outputs the prompt, also accepts
