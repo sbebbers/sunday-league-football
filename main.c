@@ -14,6 +14,7 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber);
 void scoutForPlayers();
 void trainingSession();
 void purchaseMinibus();
+void randomise();
 void rentGround();
 void viewSquad();
 unsigned char prompt(unsigned char txt[32], unsigned char lineNumber);
@@ -126,7 +127,7 @@ unsigned char teamName[16];
 signed long money				= 1;
 unsigned char year;
 unsigned char league;
-unsigned short entropy;
+unsigned char random;
 
 unsigned char numberOfPlayers	= 0;
 unsigned char noOfGoalKeepers	= 0;
@@ -255,7 +256,6 @@ void startGame()
 	{
 		manager[y] = _strBuffer[y];
 	}
-	entropy			+= srand(manager[0])%8;
 	manager[y]		= 0;
 	cls();
 	
@@ -320,7 +320,7 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 		unsigned char inverse;
 		unsigned char y	= 5;
 		cls();
-		printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney £%ld", weekNumber, numberOfPlayers, money);
+		printf("PRE-SEASON week: %d\nnumber of players: %d\nmoney \xa3%ld", weekNumber, numberOfPlayers, money);
 		
 		if(teamName[0] == EOF)
 		{
@@ -387,7 +387,7 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 			kitPurchased++;
 			money		-= 500;
 			expenses	+= y;
-			printf("kit purchased for full squad\nhome and away for £500\nweekly kit maintenance is £5");
+			printf("kit purchased for full squad\nhome and away for \xa3" "500\nweekly kit maintenance is \xa3 " "5");
 			prompt("", 1);
 			gets(_strBuffer);
 			actionNumber--;
@@ -402,7 +402,6 @@ void preSeasonOptions(unsigned char actionNumber, unsigned char weekNumber)
 			rentGround();
 			actionNumber--;
 		}
-		entropy += y;
 	}
 }
 
@@ -424,10 +423,12 @@ void scoutForPlayers()
 	
 	while(pass)
 	{
-		playerName[0]	= _A + srand(++entropy)%25;
+		randomise();
+		
+		playerName[0]	= _A + srand(random)%25;
 		playerName[1]	= CLEAR;
 		
-		y = srand(entropy)%239;
+		y = srand(random)%239;
 		x = 2;
 		while(playerNames[y++] != EOF){}
 		
@@ -440,7 +441,7 @@ void scoutForPlayers()
 		
 		setText(sign, 0, 0, 0);
 		setText(playerName, 18, 0, 1);
-		x = 5 * (srand(entropy)%48) + 5;
+		x = 5 * (srand(random)%48) + 5;
 		
 		if(noOfGoalKeepers == 3)
 		{
@@ -472,7 +473,7 @@ void scoutForPlayers()
 		}
 		if(pass)
 		{
-			printf("for £%d Y/N", x);
+			printf("for \xa3%d Y/N", x);
 			prompt("", 1);
 			gets(_strBuffer);
 			if(_strBuffer[0] == 121)
@@ -540,6 +541,7 @@ void scoutForPlayers()
 					}
 				}
 			}
+			randomise();
 			pass--;
 		}
 	}
@@ -567,12 +569,17 @@ void trainingSession()
 		{
 			if(teamRatings[x-1] < SEVEN && x)
 			{
-				teamRatings[x-1] += srand(++entropy)%2;
+				randomise();
+				teamRatings[x-1] += srand(random)%2;
+				if(!random % 19)
+				{
+					teamRatings[x-1]++;
+				}
 			}
 		}
 	}
 	x = (10 + numberOfPlayers) * 5;
-	printf("the training session cost £%d\n\nview squad to see which players have improved",x);
+	printf("the training session cost \xa3%d\n\nview squad to see which players have improved",x);
 	money -= x;
 	prompt("",1);
 	gets(_strBuffer);
@@ -630,8 +637,9 @@ void rentGround()
 {
 	unsigned char _strBuffer[STRBFSIZE];
 	unsigned char y;
-	y	= 10 * (srand(++entropy)%24);
-	printf("a local rugby league club has\noffer a ground share for £%d\nwith weekly expenses of £25",y);
+	randomise();
+	y	= 10 * (srand(random)%24);
+	printf("a local rugby league club has\noffer a ground share for \xa3%d\nwith weekly expenses of \xa3" "25", y);
 	prompt("Y/N?",1);
 	gets(_strBuffer);
 	if(_strBuffer[0] == 121)
@@ -752,7 +760,6 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
 	unsigned char c = 0;
 	while(txt[c] != EOF)
 	{
-		++entropy;
 		if(inv)
 		{
 			text[c] = INVERSE(txt[c]);
@@ -779,7 +786,6 @@ unsigned char setText(unsigned char txt[33], unsigned char x, unsigned char y, u
 void zx80Init()
 {
 	unsigned char y;
-	entropy++;
 	text[0] = EOF;
 	for(y = 24; y > 0; y--)
 	{
@@ -798,7 +804,7 @@ void zx80Init()
  */
 void printSpc(unsigned char spc, unsigned char txt[31])
 {
-	for(spc; spc > 0; spc--)
+	for(; spc > 0; spc--)
 	{
 		printf(" ");
 	}
@@ -834,7 +840,6 @@ unsigned char prompt(unsigned char txt[32], unsigned char lineNumber)
 	unsigned char y;
 	if(lineNumber)
 	{
-		++entropy;
 		for(y = lineNumber; y > 0; y--)
 		{
 			printf("\n");
@@ -884,7 +889,6 @@ void cls()
 	call $0747
 	exx
 	__endasm;
-	++entropy;
 }
 
 /**
@@ -893,7 +897,7 @@ void cls()
  * to work out which character or string
  * to write to the DFILE and at what position
  *
- * @param	unsigned char, unsigned char
+ * @param	unsigned short
  * @author	sbebbington
  * @date	22 Aug 2017
  * @version	1.2b
@@ -916,5 +920,23 @@ unsigned char printAt(unsigned short xy) __z88dk_fastcall
 		inc hl
 		jr CHAROUT
 	RETURN:
+	__endasm;
+}
+
+/**
+ * Replacement for entropy
+ * call function and use
+ * the random variable
+ *
+ * @author	sbebbington
+ * @date	27 Nov 2017
+ * @version	1.0
+ */
+void randomise()
+{
+	__asm
+	ld hl, ($401e)
+	ld a, l
+	ld (_random), a
 	__endasm;
 }
